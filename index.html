@@ -783,5 +783,25 @@
             window.location.reload();
         });
     </script>
-</body>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const qa = [{'id': 1, 'part': 1, 'q': 'แพงไปหน่อยนะ ลดราคาได้ไหม?', 'a': 'เข้าใจเลยค่ะว่ากังวลเรื่องราคา แต่สิ่งที่คุณกำลังลงทุนนี้คือ <strong>คุณภาพ</strong> และ <strong>ผลลัพธ์ที่ยั่งยืน</strong> ซึ่งเรามีบริการหลังการขายและฟีเจอร์ที่คู่แข่งไม่มี เมื่อเทียบกับมูลค่าที่คุณจะได้รับ ถือว่าคุ้มค่ามากค่ะ'}];
+    const container = document.createElement("div");
+    container.style.marginTop = "20px";
+    container.style.padding = "15px";
+    container.style.backgroundColor = "#f9f9f9";
+    container.style.border = "1px solid #ccc";
+    container.style.borderRadius = "8px";
+
+    const question = document.createElement("h4");
+    question.textContent = "คำถาม: " + qa[0].q;
+    container.appendChild(question);
+
+    const answer = document.createElement("p");
+    answer.innerHTML = "คำตอบ: " + qa[0].a;
+    container.appendChild(answer);
+
+    document.body.appendChild(container);
+});
+</script></body>
 </html>
