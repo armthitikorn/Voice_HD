@@ -1,15 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="th">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>แบบทดสอบ Roleplay | ใบประกาศนียบัตร</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>แบบทดสอบ Roleplay | ใบประกาศนียบัตร</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+<link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" referrerpolicy="no-referrer" rel="stylesheet"/>
+<style>
         /* 1. สไตล์หลักจาก Code M: พื้นหลัง Animation และ Card Structure */
         body {
             margin: 0;
@@ -126,79 +125,63 @@
     </style>
 </head>
 <body>
-
-    <div id="loadingOverlay">
-        <div class="spinner-border text-light" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-        <h5 id="loadingText" class="mt-3">กำลังเตรียมการอัปโหลด...</h5>
-        <div class="progress" role="progressbar" aria-label="Upload Progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-            <div id="uploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
-        </div>
-    </div>
-    
-    <div id="certificatePage">
-        <div class="certificate-box">
-            <h1>🎉 ขอแสดงความยินดี 🎉</h1>
-            <p>
+<div id="loadingOverlay">
+<div class="spinner-border text-light" role="status">
+<span class="visually-hidden">Loading...</span>
+</div>
+<h5 class="mt-3" id="loadingText">กำลังเตรียมการอัปโหลด...</h5>
+<div aria-label="Upload Progress" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="progress" role="progressbar">
+<div class="progress-bar progress-bar-striped progress-bar-animated" id="uploadProgressBar" style="width: 0%"></div>
+</div>
+</div>
+<div id="certificatePage">
+<div class="certificate-box">
+<h1>🎉 ขอแสดงความยินดี 🎉</h1>
+<p>
                 คุณได้ผ่านการทดสอบ **Roleplay: การรับมือข้อโต้แย้งลูกค้า** <br/>
                 และได้แสดงให้เห็นถึงทักษะในการเจรจาที่เป็นเลิศ
             </p>
-            <h3>มอบให้แก่</h3>
-            <div class="name" id="certificateUserName"></div>
-            <p>
+<h3>มอบให้แก่</h3>
+<div class="name" id="certificateUserName"></div>
+<p>
                 ในฐานะผู้มีความสามารถในการจัดการสถานการณ์ที่ท้าทายได้อย่างมีประสิทธิภาพ
             </p>
-            <button id="resetQuizBtn" class="btn btn-warning mt-4"><i class="bi bi-arrow-clockwise"></i> เริ่มทำแบบทดสอบใหม่</button>
-        </div>
-    </div>
-
-
-    <div class="card-container">
-        <h2 class="text-center mb-4">แบบทดสอบ Roleplay: การรับมือข้อโต้แย้ง</h2>
-        
-        <div class="user-name-input">
-            <label for="inputUserName" class="form-label">ชื่อ-นามสกุล/รหัสพนักงาน (สำหรับใบประกาศฯ)</label>
-            <input type="text" class="form-control" id="inputUserName" placeholder="กรอกชื่อของคุณ" required>
-        </div>
-        
-        <div class="d-flex justify-content-center mb-4">
-            <button class="btn btn-outline-primary btn-sm mx-1 active" data-part="part1" onclick="loadPart('part1')">Part 1</button>
-            <button class="btn btn-outline-primary btn-sm mx-1" data-part="part2" onclick="loadPart('part2')">Part 2</button>
-            <button class="btn btn-outline-primary btn-sm mx-1" data-part="part3" onclick="loadPart('part3')">Part 3</button>
-        </div>
-
-        <div class="alert alert-light text-center" role="alert">
-            <h4 class="alert-heading mb-0" id="questionText"></h4>
-        </div>
-
-        <div class="text-center mb-4">
-            <p class="mb-2" id="recordStatus">สถานะ: พร้อมบันทึก</p>
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <button id="startRecord" class="btn btn-danger btn-lg"><i class="bi bi-mic-fill"></i> เริ่มบันทึก</button>
-                <button id="stopRecord" class="btn btn-secondary btn-lg" disabled><i class="bi bi-stop-fill"></i> หยุดบันทึก</button>
-                <button id="saveRecord" class="btn btn-success btn-lg" disabled>บันทึก & Next</button>
-            </div>
-            <audio id="audioPreview" controls class="mt-3 w-100" style="display:none;"></audio>
-        </div>
-        
-        <div class="d-flex justify-content-between mb-3">
-            <button id="prevBtn" class="btn btn-warning" disabled><i class="bi bi-arrow-left"></i> ย้อนกลับ</button>
-            <button id="nextBtn" class="btn btn-primary"><i class="bi bi-arrow-right"></i> ถัดไป</button>
-        </div>
-        
-        <div class="progress" role="progressbar" aria-label="Progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-            <div id="progressBar" class="progress-bar" style="width: 0%">0%</div>
-        </div>
-        <small id="progressInfo" class="text-muted mt-2 d-block">คำถามที่ 0 จาก 10 ข้อใน Part นี้</small>
-        
-        <div id="messageBox" class="alert mt-3" style="display:none;"></div>
-        
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script type="module">
+<button class="btn btn-warning mt-4" id="resetQuizBtn"><i class="bi bi-arrow-clockwise"></i> เริ่มทำแบบทดสอบใหม่</button>
+</div>
+</div>
+<div class="card-container">
+<h2 class="text-center mb-4">แบบทดสอบ Roleplay: การรับมือข้อโต้แย้ง</h2>
+<div class="user-name-input">
+<label class="form-label" for="inputUserName">ชื่อ-นามสกุล/รหัสพนักงาน (สำหรับใบประกาศฯ)</label>
+<input class="form-control" id="inputUserName" placeholder="กรอกชื่อของคุณ" required="" type="text"/>
+</div>
+<div class="d-flex justify-content-center mb-4">
+<button class="btn btn-outline-primary btn-sm mx-1 active" data-part="part1" onclick="loadPart('part1')">Part 1</button>
+<button class="btn btn-outline-primary btn-sm mx-1" data-part="part2" onclick="loadPart('part2')">Part 2</button>
+<button class="btn btn-outline-primary btn-sm mx-1" data-part="part3" onclick="loadPart('part3')">Part 3</button>
+</div>
+<form class="mb-4"><label class="form-label" for="questionText">คำถาม</label><textarea class="form-control mb-2" id="questionText" readonly="readonly" rows="3"></textarea><label class="form-label" for="answerText">คำตอบ</label><textarea class="form-control" id="answerText" readonly="readonly" rows="4"></textarea></form>
+<div class="text-center mb-4">
+<p class="mb-2" id="recordStatus">สถานะ: พร้อมบันทึก</p>
+<div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+<button class="btn btn-danger btn-lg" id="startRecord"><i class="bi bi-mic-fill"></i> เริ่มบันทึก</button>
+<button class="btn btn-secondary btn-lg" disabled="" id="stopRecord"><i class="bi bi-stop-fill"></i> หยุดบันทึก</button>
+<button class="btn btn-success btn-lg" disabled="" id="saveRecord">บันทึก &amp; Next</button>
+</div>
+<audio class="mt-3 w-100" controls="" id="audioPreview" style="display:none;"></audio>
+</div>
+<div class="d-flex justify-content-between mb-3">
+<button class="btn btn-warning" disabled="" id="prevBtn"><i class="bi bi-arrow-left"></i> ย้อนกลับ</button>
+<button class="btn btn-primary" id="nextBtn"><i class="bi bi-arrow-right"></i> ถัดไป</button>
+</div>
+<div aria-label="Progress" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="progress" role="progressbar">
+<div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+</div>
+<small class="text-muted mt-2 d-block" id="progressInfo">คำถามที่ 0 จาก 10 ข้อใน Part นี้</small>
+<div class="alert mt-3" id="messageBox" style="display:none;"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
         // 🚨 หมายเหตุ: หากเปิดไฟล์นี้โดยตรง (file:///) อาจพบข้อผิดพลาด 'Unexpected token import' 
         // กรุณาเปิดผ่าน Web Server (เช่น GitHub Pages, Live Server ใน VS Code)
         
