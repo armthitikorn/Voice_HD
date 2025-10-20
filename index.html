@@ -3,213 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แบบทดสอบการพูดและการบันทึกเสียง (90 ข้อ - ส่งได้ทันที)</title>
+    <title>แบบทดสอบการพูดและการบันทึกเสียง (90 ข้อ - แก้ไขปัญหาปุ่มไม่ทำงาน)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        }
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 15px;
-        }
-        h1 {
-            color: #007bff;
-            font-weight: 700;
-        }
-        .user-info {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            align-items: center;
-        }
-        .user-info label {
-            font-weight: 700;
-        }
-        .user-info input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            flex-grow: 1;
-            font-size: 16px;
-        }
-        .part-selection {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .part-button {
-            padding: 12px 25px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            transition: background-color 0.3s;
-        }
-        .part-button:hover {
-            background-color: #1e7e34;
-        }
-        .part-button.active {
-            background-color: #0056b3;
-        }
-        .exam-area {
-            display: flex;
-            gap: 20px;
-            min-height: 500px;
-        }
-        .question-list {
-            flex: 0 0 250px;
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        .question-item {
-            padding: 10px;
-            margin-bottom: 5px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .question-item:hover {
-            background-color: #e9ecef;
-        }
-        .question-item.active {
-            background-color: #007bff;
-            color: white;
-            font-weight: 700;
-        }
-        .status-icon {
-            font-size: 18px;
-            line-height: 1;
-            margin-left: 10px;
-        }
-        .question-content {
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        .question-content h3 {
-            margin-top: 0;
-            color: #dc3545;
-        }
-        
-        /* สไตล์สำหรับ Q&A */
-        .prompt-area {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ff9800;
-            border-radius: 8px;
-            background-color: #fff3e0;
-        }
-        .response-area {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 2px solid #28a745;
-            border-radius: 8px;
-            background-color: #e8f5e9;
-        }
-        .response-area p {
-            font-size: 18px;
-            line-height: 1.6;
-            font-weight: 600; 
-            white-space: pre-wrap;
-        }
-        .recording-area {
-            margin-top: 25px;
-            padding: 15px;
-            border: 1px dashed #007bff;
-            border-radius: 6px;
-            text-align: center;
-        }
-        .recording-area button {
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            transition: background-color 0.3s;
-        }
-        #startRecBtn {
-            background-color: #dc3545;
-            color: white;
-        }
-        #startRecBtn:hover {
-            background-color: #c82333;
-        }
-        #stopRecBtn {
-            background-color: #ffc107;
-            color: #333;
-        }
-        #stopRecBtn:hover {
-            background-color: #e0a800;
-        }
-        #playbackAudio {
-            width: 100%;
-            margin-top: 15px;
-            display: none; /* ซ่อนไว้ตั้งแต่แรก */
-        }
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        #submitBtn {
-            background-color: #28a745;
-            color: white;
-            padding: 15px 30px;
-            width: 100%;
-            margin-top: 30px;
-            font-size: 18px;
-            border: none; /* เพิ่มให้เป็นมาตรฐานของปุ่ม */
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #submitBtn:hover {
-            background-color: #1e7e34;
-        }
-        /* ลบ [disabled] ออกจากปุ่มส่งแล้ว */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            font-size: 24px;
-            color: #007bff;
-            font-weight: 700;
-        }
+        /* CSS Style เดิม (เพื่อความกระชับ) */
+        body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1200px; margin: auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); }
+        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px; }
+        h1 { color: #007bff; font-weight: 700; }
+        .user-info { display: flex; gap: 15px; margin-bottom: 25px; align-items: center; }
+        .user-info label { font-weight: 700; }
+        .user-info input { padding: 10px; border: 1px solid #ccc; border-radius: 6px; flex-grow: 1; font-size: 16px; }
+        .part-selection { display: flex; gap: 15px; margin-bottom: 30px; }
+        .part-button { padding: 12px 25px; background-color: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 700; transition: background-color 0.3s; }
+        .part-button:hover { background-color: #1e7e34; }
+        .part-button.active { background-color: #0056b3; }
+        .exam-area { display: flex; gap: 20px; min-height: 500px; }
+        .question-list { flex: 0 0 250px; background-color: #f8f9fa; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); max-height: 500px; overflow-y: auto; }
+        .question-item { padding: 10px; margin-bottom: 5px; border-radius: 4px; cursor: pointer; transition: background-color 0.2s, color 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .question-item:hover { background-color: #e9ecef; }
+        .question-item.active { background-color: #007bff; color: white; font-weight: 700; }
+        .status-icon { font-size: 18px; line-height: 1; margin-left: 10px; }
+        .question-content { flex: 1; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .question-content h3 { margin-top: 0; color: #dc3545; }
+        .prompt-area { margin-bottom: 20px; padding: 15px; border: 1px solid #ff9800; border-radius: 8px; background-color: #fff3e0; }
+        .response-area { margin-bottom: 20px; padding: 15px; border: 2px solid #28a745; border-radius: 8px; background-color: #e8f5e9; }
+        .response-area p { font-size: 18px; line-height: 1.6; font-weight: 600; white-space: pre-wrap; }
+        .recording-area { margin-top: 25px; padding: 15px; border: 1px dashed #007bff; border-radius: 6px; text-align: center; }
+        .recording-area button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 700; transition: background-color 0.3s; }
+        #startRecBtn { background-color: #dc3545; color: white; }
+        #startRecBtn:hover { background-color: #c82333; }
+        #stopRecBtn { background-color: #ffc107; color: #333; }
+        #stopRecBtn:hover { background-color: #e0a800; }
+        #playbackAudio { width: 100%; margin-top: 15px; display: none; }
+        .controls { display: flex; justify-content: space-between; margin-top: 20px; }
+        #submitBtn { background-color: #28a745; color: white; padding: 15px 30px; width: 100%; margin-top: 30px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s; }
+        #submitBtn:hover { background-color: #1e7e34; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: none; justify-content: center; align-items: center; z-index: 1000; font-size: 24px; color: #007bff; font-weight: 700; }
+        .alert.warning { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; padding: 10px; border-radius: 5px; margin-bottom: 15px; display: none; }
+        .alert.success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; padding: 10px; border-radius: 5px; margin-bottom: 15px; display: none; }
     </style>
 </head>
 <body>
@@ -220,7 +53,7 @@
             <p>โจทย์: พนักงานอ่าน **คำถาม (Q)** ในใจ และพูด **คำตอบ (A)** ออกมาเพื่อบันทึกเสียง</p>
         </header>
 
-        <div class="alert" id="mainAlert"></div>
+        <div class="alert warning" id="mainAlert"></div>
         
         <div class="user-info">
             <label for="inputUserName">ชื่อ-นามสกุล/รหัสพนักงาน:</label>
@@ -273,15 +106,23 @@
         กำลังประมวลผลและอัปโหลดไฟล์เสียง... โปรดรอสักครู่
     </div>
 
-    <script type="module">
-        // --- Supabase Imports & Config ---
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-        // **ตั้งค่า Supabase ของคุณ**
-        // !!! ข้อมูลได้ถูกใส่แล้วตามที่คุณลูกค้าแชร์มา !!!
+    <script>
+        // *** Supabase Config (ใช้ค่าเดิมที่คุณลูกค้าให้ไว้) ***
         const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co'; 
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        
+        // ตรวจสอบว่า Supabase ถูกโหลดแล้วหรือไม่
+        let supabase;
+        if (typeof supabaseJs !== 'undefined' && typeof supabaseJs.createClient === 'function') {
+            supabase = supabaseJs.createClient(supabaseUrl, supabaseKey);
+        } else {
+             // ถ้าโหลดไม่สำเร็จ จะแจ้งเตือน
+            document.addEventListener('DOMContentLoaded', () => {
+                showAlert('**ERROR:** ไม่สามารถเชื่อมต่อ Supabase library ได้! กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต', 'warning');
+                document.getElementById('submitBtn').disabled = true;
+            });
+        }
+
 
         // --- Questions Data (90 ข้อ) ---
         const questions = {
@@ -384,14 +225,13 @@
         };
         
         // --- Global Variables ---
-        // audioBlobs จะเก็บไฟล์เสียงที่บันทึกสำเร็จ: { part_id: { question_id: Blob } }
         let audioBlobs = { part1: {}, part2: {}, part3: {} }; 
         let mediaRecorder;
         let audioChunks = [];
-        let mediaStream; // เก็บ Stream ของไมโครโฟน
+        let mediaStream;
         let currentPart = 'part1'; 
         let currentQIndex = 0;
-        let questionsInPart = questions.part1; // กำหนดค่าเริ่มต้น
+        let questionsInPart = questions.part1;
         let isRecording = false;
 
         // --- DOM Elements ---
@@ -413,20 +253,31 @@
         // --- Functions ---
 
         function showAlert(message, type = 'warning') {
-            mainAlertEl.textContent = message;
+            mainAlertEl.innerHTML = message;
             mainAlertEl.className = `alert ${type}`;
             mainAlertEl.style.display = 'block';
+            if (type === 'success') {
+                setTimeout(() => mainAlertEl.style.display = 'none', 3000);
+            }
         }
 
-        function loadPart(partKey) {
+        // ตรวจสอบความพร้อมของ Supabase (เพิ่มมาเพื่อป้องกันปัญหาปุ่มกดไม่ไป)
+        function checkSupabaseConnection() {
+            if (!supabase) {
+                showAlert('**ERROR:** Supabase Connection Failed. กรุณาตรวจสอบการตั้งค่า.', 'warning');
+                return false;
+            }
+            return true;
+        }
+
+        window.loadPart = function(partKey) {
             const userName = inputUserNameEl.value.trim();
             if (!userName) {
-                showAlert('กรุณากรอก ชื่อ-นามสกุล/รหัสพนักงาน ก่อนเลือก Part');
+                showAlert('กรุณากรอก ชื่อ-นามสกุล/รหัสพนักงาน ก่อนเลือก Part', 'warning');
                 return;
             }
             showAlert('', 'hide'); 
 
-            // อัปเดตสถานะปุ่ม Part
             document.querySelectorAll('.part-button').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -450,8 +301,6 @@
                 item.innerHTML = `<span>${q.id}</span> <span class="status-icon" id="status-${q.id}"></span>`;
                 item.onclick = () => displayQuestion(index);
                 questionListEl.appendChild(item);
-
-                // อัปเดตสถานะการบันทึกเมื่อโหลดลิสต์
                 updateQuestionStatus(q.id, !!audioBlobs[currentPart][q.id]);
             });
         }
@@ -462,7 +311,7 @@
             if (statusIcon) {
                 statusIcon.textContent = isRecorded ? '✅' : '';
                 if (isRecorded) {
-                    itemEl.style.backgroundColor = '#d4edda'; // สีเขียวอ่อน
+                    itemEl.style.backgroundColor = '#d4edda';
                 } else {
                     itemEl.style.backgroundColor = '';
                 }
@@ -472,7 +321,6 @@
         function displayQuestion(index) {
             if (index < 0 || index >= questionsInPart.length) return;
 
-            // ตรวจสอบสถานะการบันทึกก่อนเปลี่ยนข้อ
             if (isRecording) {
                 showAlert('กรุณาหยุดบันทึกเสียงก่อนเปลี่ยนข้อ!', 'warning');
                 return;
@@ -481,22 +329,18 @@
             currentQIndex = index;
             const currentQ = questionsInPart[currentQIndex];
 
-            // อัปเดตเนื้อหา
             currentQuestionTitleEl.textContent = `คำถามที่ ${currentQIndex + 1} (${currentQ.id})`;
             questionPromptEl.textContent = currentQ.q;
             requiredAnswerEl.textContent = currentQ.a;
 
-            // เน้นข้อที่เลือกในรายการ
             document.querySelectorAll('.question-item').forEach(item => {
                 item.classList.remove('active');
             });
             document.getElementById(`q-item-${currentQ.id}`).classList.add('active');
 
-            // อัปเดตปุ่มก่อนหน้า/ถัดไป
             prevBtn.style.display = currentQIndex > 0 ? 'inline-block' : 'none';
             nextBtn.style.display = currentQIndex < questionsInPart.length - 1 ? 'inline-block' : 'none';
 
-            // รีเซ็ตพื้นที่บันทึกเสียงและเล่นไฟล์ที่บันทึกไว้ (ถ้ามี)
             resetRecordingArea();
             const recordedBlob = audioBlobs[currentPart][currentQ.id];
             if (recordedBlob) {
@@ -522,17 +366,16 @@
             isRecording = false;
         }
 
-        function prevQuestion() {
+        window.prevQuestion = function() {
             displayQuestion(currentQIndex - 1);
         }
 
-        function nextQuestion() {
+        window.nextQuestion = function() {
             displayQuestion(currentQIndex + 1);
         }
 
         async function initRecording() {
             try {
-                // ขอสิทธิ์การใช้ไมโครโฟน
                 mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
                 
@@ -546,10 +389,8 @@
 
                     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                     
-                    // 1. เก็บไฟล์เสียงเข้าในโครงสร้างข้อมูล
                     audioBlobs[currentPart][currentQ.id] = audioBlob; 
                     
-                    // 2. แสดงไฟล์เสียงที่บันทึก
                     const audioUrl = URL.createObjectURL(audioBlob);
                     playbackAudioEl.src = audioUrl;
                     playbackAudioEl.style.display = 'block';
@@ -559,29 +400,27 @@
                     stopRecBtn.disabled = true;
                     isRecording = false;
 
-                    // 3. อัปเดตสถานะในรายการคำถาม
                     updateQuestionStatus(currentQ.id, true);
                     
-                    // ปิด Stream ไมค์เมื่อบันทึกเสร็จ (สำคัญ)
                     mediaStream.getTracks().forEach(track => track.stop());
                 };
                 
                 return true;
             } catch (err) {
                 console.error('ไม่สามารถเข้าถึงไมโครโฟน:', err);
-                showAlert('ไม่สามารถเข้าถึงไมโครโฟนได้ กรุณาตรวจสอบสิทธิ์การใช้งาน', 'warning');
+                showAlert('ไม่สามารถเข้าถึงไมโครโฟนได้ กรุณาตรวจสอบสิทธิ์การใช้งาน (โดยเฉพาะเมื่อใช้ HTTPS/localhost)', 'warning');
                 return false;
             }
         }
 
-        async function handleStartRecording() {
+        window.handleStartRecording = async function() {
             const userName = inputUserNameEl.value.trim();
             if (!userName) {
                 showAlert('กรุณากรอก ชื่อ-นามสกุล/รหัสพนักงาน ก่อนเริ่มบันทึกเสียง', 'warning');
                 return;
             }
 
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
+            if (isRecording) {
                 showAlert('กำลังบันทึกอยู่ กรุณาหยุดก่อนเริ่มใหม่', 'warning');
                 return;
             }
@@ -598,7 +437,7 @@
             }
         }
 
-        function handleStopRecording() {
+        window.handleStopRecording = function() {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
                 recordingStatusEl.textContent = 'สถานะ: กำลังประมวลผลไฟล์...';
@@ -607,9 +446,11 @@
 
 
         // =========================================================
-        // ฟังก์ชันส่งคำตอบ (ตรรกะที่ได้รับการแก้ไข: ส่งข้อมูลทั้งหมด แม้จะไม่มีไฟล์เสียง)
+        // ฟังก์ชันส่งคำตอบ (หลักการเดิม: ส่งข้อมูลทั้งหมด แม้จะไม่มีไฟล์เสียง)
         // =========================================================
-        async function submitExam() {
+        window.submitExam = async function() {
+            if (!checkSupabaseConnection()) return; // ตรวจสอบการเชื่อมต่อ
+            
             const submitButton = document.getElementById('submitBtn');
             const loadingOverlay = document.getElementById('loadingOverlay');
             const userName = inputUserNameEl.value.trim();
@@ -619,7 +460,6 @@
                 return; 
             }
 
-            // ปิดปุ่มและแสดง Loading
             submitButton.disabled = true;
             loadingOverlay.style.display = 'flex';
             
@@ -628,7 +468,7 @@
             let uploadedCount = 0;
 
             try {
-                // 1. รวบรวมข้อมูลการส่งจากทุก Part (part1, part2, part3)
+                // 1. รวบรวมข้อมูลการส่งจากทุก Part 
                 for (const partKey of Object.keys(questions)) {
                     for (const question of questions[partKey]) {
                         totalQuestions++;
@@ -639,7 +479,7 @@
                         let fileUrl = '';
                         let fileName = null;
                         
-                        // 2. **ตรรกะการตรวจสอบไฟล์เสียง:** ดำเนินการอัปโหลดเฉพาะข้อที่มี Blob
+                        // 2. ดำเนินการอัปโหลดเฉพาะข้อที่มี Blob
                         if (audioBlob) {
                             uploadedCount++;
                             fileName = `${questionId}-${userName}-${Date.now()}.webm`;
@@ -666,15 +506,15 @@
                             }
                         } 
 
-                        // 3. เพิ่มข้อมูลเข้าในรายการที่จะส่ง (บันทึกเสมอ)
+                        // 3. บันทึกข้อมูลเข้าในรายการที่จะส่ง (บันทึกเสมอ)
                         submissions.push({
                             user_name: userName,
                             question_id: questionId,
                             part: partKey,
                             question_text: question.q,
                             answer_script: question.a,
-                            file_url: fileUrl, // เป็น URL หรือ ''
-                            file_name: fileName // เป็นชื่อไฟล์ หรือ null
+                            file_url: fileUrl, 
+                            file_name: fileName 
                         });
                     }
                 }
@@ -688,8 +528,7 @@
                     if (insertError) throw insertError;
 
                     showAlert(`ส่งคำตอบสำเร็จ! บันทึกข้อมูล ${totalQuestions} ข้อ (อัปโหลดไฟล์เสียง ${uploadedCount} ไฟล์)`, 'success');
-                    // รีเซ็ตสถานะหลังส่งสำเร็จ (อาจใช้ delay ก่อน reload)
-                    setTimeout(() => window.location.reload(), 2000); 
+                    setTimeout(() => window.location.reload(), 3000); 
 
                 } else {
                     showAlert('ไม่พบคำถามในระบบ โปรดลองโหลด Part ใหม่', 'warning');
@@ -697,19 +536,20 @@
 
             } catch (error) {
                 console.error('เกิดข้อผิดพลาดในการส่งข้อมูล:', error.message);
-                showAlert(`การส่งคำตอบล้มเหลว: ${error.message}`, 'warning');
+                showAlert(`**การส่งคำตอบล้มเหลว:** ${error.message} (โปรดตรวจสอบการตั้งค่า Supabase/ตาราง submissions)`, 'warning');
             } finally {
-                // เปิดใช้งานปุ่มกลับมาเสมอ
                 loadingOverlay.style.display = 'none';
                 submitButton.disabled = false;
             }
         }
 
-        // --- Event Listeners and Initial Load ---
-        document.getElementById('submitBtn').addEventListener('click', submitExam);
-        // กำหนดให้ Part 1 โหลดทันทีที่เปิดหน้า
+        // --- Initial Load Logic ---
         document.addEventListener('DOMContentLoaded', () => {
-            // loadPart('part1'); // สามารถเรียกฟังก์ชันนี้ถ้าต้องการโหลดอัตโนมัติ
+            // ตรวจสอบสถานะการเชื่อมต่อเมื่อ DOM โหลดเสร็จ
+            if (!checkSupabaseConnection()) {
+                document.getElementById('submitBtn').disabled = true;
+            }
+            // ไม่โหลด Part 1 อัตโนมัติ เพื่อให้ผู้ใช้กรอกชื่อก่อน
         });
 
     </script>
