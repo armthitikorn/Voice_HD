@@ -7,6 +7,7 @@
 <title>แบบทดสอบการพูดและการบันทึกเสียง</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&amp;display=swap" rel="stylesheet"/>
 <style>
+        /* CSS Styles (ไม่ต้องแก้ไข) */
         body {
             font-family: 'Sarabun', sans-serif;
             background-color: #f4f7f6;
@@ -252,7 +253,6 @@
             color: #007bff;
             font-weight: 700;
         }
-        
     </style>
 </head>
 <body>
@@ -326,7 +326,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
-// --- Core Functions: Upload & Submission Logic (UPDATED - EXAM_ID REMOVED) ---
+// --- Core Functions: Upload & Submission Logic (Minimal Data Sent) ---
 
 /**
  * @description อัปโหลดไฟล์เสียงไปยัง Supabase Storage Bucket แบบแยกไฟล์
@@ -697,7 +697,7 @@ async function uploadAudioToSupabase(file, partNumber) {
             }
         };
 
-        // --- Submission & Upload (FINAL FIX: EXAM_ID REMOVED) ---
+        // --- Submission & Upload (MINIMAL DATA SENT) ---
 
         /**
          * @description ตรวจสอบว่ามีไฟล์เสียงที่บันทึกแล้วหรือไม่ เพื่อเปิดใช้งานปุ่มส่ง
@@ -731,7 +731,6 @@ async function uploadAudioToSupabase(file, partNumber) {
             }
 
             const partBlobs = audioBlobs[currentPart];
-            // 💡 ลบ const examId = 'Tk_test01'; ออก
             const userName = inputUserName.value.trim();
             const partNumber = currentPart.replace('part', ''); // '1', '2', or '3'
 
@@ -752,29 +751,20 @@ async function uploadAudioToSupabase(file, partNumber) {
                     const submissionPromise = uploadAudioToSupabase(audioFile, partNumber)
                         .then(publicUrl => {
                             // 2. บันทึกข้อมูลการส่งของ 'คำถามเดียว' ไปยังตาราง submissions
-                            const allQuestions = questions[currentPart];
-                            const questionData = allQuestions.find(q => q.id === questionId);
-                            const questionText = questionData ? questionData.q : 'N/A';
-                            const responseText = questionData ? questionData.a : 'N/A';
-                            
+                            // 💡 ส่งเฉพาะคอลัมน์ที่จำเป็นและมั่นใจว่ามีในฐานข้อมูล
                             return supabase
                                 .from('submissions')
                                 .insert([
                                     {
                                         user_name: userName, 
-                                        // 💡 ลบ exam_id ออกจาก Object นี้
                                         part_number: partNumber, 
-                                        question_id: questionId, 
                                         response_url: publicUrl,
-                                        question_text: questionText, 
-                                        text: responseText, 
                                         submitted_at: new Date().toISOString()
                                     }
                                 ]);
                         })
                         .then(({ error }) => {
                             if (error) {
-                                // 💡 ข้อความ Error ที่ถูกปรับปรุงให้ไม่กล่าวถึง exam_id แล้ว
                                 throw new Error(`DB Insert Error for ${questionId}. Details: ${error.message}`);
                             }
                             console.log(`DB insert successful for ${questionId}.`);
@@ -799,7 +789,7 @@ async function uploadAudioToSupabase(file, partNumber) {
                     const successfulCount = recordedCount - failedSubmissions.length;
 
                     if (failedSubmissions.length > 0) {
-                         // แสดงข้อความแจ้งเตือน
+                         // แสดงข้อความแจ้งเตือนเมื่อมีข้อผิดพลาดบางส่วน
                          showAlert(`ส่งคำตอบสำเร็จ ${successfulCount} ข้อ แต่มี ${failedSubmissions.length} ข้อที่เกิดข้อผิดพลาดในการอัปโหลด/บันทึกข้อมูล (โปรดดู Console Log เพื่อดูรายละเอียด)`, 'warning');
                     } else {
                         showAlert('ส่งคำตอบและไฟล์เสียงสำเร็จเรียบร้อยแล้ว!', 'success');
@@ -810,7 +800,7 @@ async function uploadAudioToSupabase(file, partNumber) {
                     renderQuestionList(); 
                     submitBtn.disabled = true;
                     
-                    // เปลี่ยนสถานะหน้าจอเป็นหน้าเลือก Part ใหม่
+                    // เปลี่ยนสถานะหน้าจอ
                     document.getElementById('examArea').style.display = 'none';
                     document.getElementById('currentQuestionTitle').textContent = 'ส่งงานสำเร็จ';
                     document.getElementById('questionPrompt').textContent = 'กรุณาเลือก Part อื่นเพื่อทำแบบทดสอบต่อ';
