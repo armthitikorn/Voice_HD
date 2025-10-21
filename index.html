@@ -822,7 +822,6 @@ async function submitResponse(currentUserId, recordedBlob) {
         checkSubmitButtonStatus();
         
     </script>
-
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 import { v4 as uuidv4 } from 'https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/esm-browser/index.js';
@@ -859,6 +858,53 @@ async function uploadAudioToSupabase(file) {
 
 // Example usage: uploadAudioToSupabase(audioFile);
 </script>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { v4 as uuidv4 } from 'https://cdn.jsdelivr.net/npm/uuid@9.0.0/+esm';
 
-</body>
+const supabase = createClient(
+  'https://wzwyotzzxycqfwercakh.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno'
+);
+
+async function uploadAudioToSupabase(file) {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${uuidv4()}.${fileExt}`;
+  const filePath = `responses/${fileName}`;
+
+  const { data, error } = await supabase.storage
+    .from('responses')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+
+  if (error) {
+    console.error('Upload error:', error.message);
+    alert('เกิดข้อผิดพลาดในการอัปโหลดไฟล์เสียง');
+    return null;
+  }
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('responses')
+    .getPublicUrl(filePath);
+
+  console.log('Uploaded file URL:', publicUrl);
+  return publicUrl;
+}
+
+document.getElementById("submitBtn").addEventListener("click", async () => {
+  const audioElement = document.getElementById("playbackAudio");
+  const src = audioElement.src;
+  if (!src) {
+    alert("ยังไม่มีไฟล์เสียงให้ส่ง");
+    return;
+  }
+
+  const response = await fetch(src);
+  const blob = await response.blob();
+  const file = new File([blob], "response.webm", { type: "audio/webm" });
+  await uploadAudioToSupabase(file);
+});
+</script></body>
 </html>
