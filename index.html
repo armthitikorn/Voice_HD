@@ -741,9 +741,9 @@ async function uploadAudioToSupabase(file, partNumber) {
                                 .from('submissions')
                                 .insert([
                                     {
-                                        user_name: Name, 
+                                        user_name: name, 
                                         exam_id: question_text,
-                                        part_id: part_Number, // ใช้หมายเลข Part
+                                        part_id: part_number, // ใช้หมายเลข Part
                                         question_id: question_text, // รหัสคำถาม
                                         response_url: audio_url,
                                         submitted_at: new Date().toISOString()
