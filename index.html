@@ -320,13 +320,13 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 import { v4 as uuidv4 } from 'https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/esm-browser/index.js';
 
-// **!!! สำคัญ: ตรวจสอบและแก้ไข Public Key หากมีการเปลี่ยนแปลง !!!**
+// **!!! สำคัญ: กรุณาตรวจสอบและแก้ไข Supabase Keys หากมีการเปลี่ยนแปลง !!!**
 const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
-// --- Core Functions: Upload & Submission Logic (UPDATED) ---
+// --- Core Functions: Upload & Submission Logic (UPDATED - EXAM_ID REMOVED) ---
 
 /**
  * @description อัปโหลดไฟล์เสียงไปยัง Supabase Storage Bucket แบบแยกไฟล์
@@ -507,7 +507,7 @@ async function uploadAudioToSupabase(file, partNumber) {
          * @returns {string} ชื่อไฟล์ (เช่น john_doe_P1Q1_1761050405227.webm)
          */
         function generateFileName(questionId) {
-            // 💡 แทนที่อักขระที่ไม่ใช่ตัวอักษร/ตัวเลข/ภาษาไทยด้วย '_' เพื่อป้องกันปัญหา Path
+            // แทนที่อักขระที่ไม่ใช่ตัวอักษร/ตัวเลข/ภาษาไทยด้วย '_' เพื่อป้องกันปัญหา Path
             const userName = inputUserName.value.trim().replace(/[^a-zA-Z0-9ก-ฮเ-์]/g, '_'); 
             const timestamp = Date.now();
             return `${userName}_${questionId}_${timestamp}.webm`;
@@ -531,7 +531,7 @@ async function uploadAudioToSupabase(file, partNumber) {
                 item.id = `q-item-${index}`;
                 item.setAttribute('onclick', `displayQuestionFromList(${index})`);
                 
-                // 💡 ใช้ currentPart เพื่อเข้าถึง audioBlobs ที่ถูกต้อง
+                // ใช้ currentPart เพื่อเข้าถึง audioBlobs ที่ถูกต้อง
                 const isRecorded = audioBlobs[currentPart] && audioBlobs[currentPart][q.id]; 
                 const statusIcon = isRecorded ? 
                     '<span class="status-icon" style="color: green;">✓</span>' :
@@ -697,7 +697,7 @@ async function uploadAudioToSupabase(file, partNumber) {
             }
         };
 
-        // --- Submission & Upload (FIXED LOGIC) ---
+        // --- Submission & Upload (FINAL FIX: EXAM_ID REMOVED) ---
 
         /**
          * @description ตรวจสอบว่ามีไฟล์เสียงที่บันทึกแล้วหรือไม่ เพื่อเปิดใช้งานปุ่มส่ง
@@ -731,7 +731,7 @@ async function uploadAudioToSupabase(file, partNumber) {
             }
 
             const partBlobs = audioBlobs[currentPart];
-            const examId = 'Tk_test01'; 
+            // 💡 ลบ const examId = 'Tk_test01'; ออก
             const userName = inputUserName.value.trim();
             const partNumber = currentPart.replace('part', ''); // '1', '2', or '3'
 
@@ -752,7 +752,6 @@ async function uploadAudioToSupabase(file, partNumber) {
                     const submissionPromise = uploadAudioToSupabase(audioFile, partNumber)
                         .then(publicUrl => {
                             // 2. บันทึกข้อมูลการส่งของ 'คำถามเดียว' ไปยังตาราง submissions
-                            // 💡 ดึงคำถาม (q) และคำตอบ (a) ที่เกี่ยวข้องมาด้วย
                             const allQuestions = questions[currentPart];
                             const questionData = allQuestions.find(q => q.id === questionId);
                             const questionText = questionData ? questionData.q : 'N/A';
@@ -763,12 +762,10 @@ async function uploadAudioToSupabase(file, partNumber) {
                                 .insert([
                                     {
                                         user_name: userName, 
-                                        exam_id: examId,
-                                        // 💡 แก้ไขสำคัญ: เปลี่ยนเป็น part_number เพื่อให้ตรงกับ Supabase DB
+                                        // 💡 ลบ exam_id ออกจาก Object นี้
                                         part_number: partNumber, 
-                                        question_id: questionId, // รหัสคำถาม
+                                        question_id: questionId, 
                                         response_url: publicUrl,
-                                        // 💡 เพิ่ม: บันทึกข้อความคำถามและคำตอบลงในคอลัมน์ question_text และ text
                                         question_text: questionText, 
                                         text: responseText, 
                                         submitted_at: new Date().toISOString()
@@ -777,7 +774,7 @@ async function uploadAudioToSupabase(file, partNumber) {
                         })
                         .then(({ error }) => {
                             if (error) {
-                                // 💡 ปรับปรุงการแจ้ง Error เพื่อให้เข้าใจง่ายขึ้น
+                                // 💡 ข้อความ Error ที่ถูกปรับปรุงให้ไม่กล่าวถึง exam_id แล้ว
                                 throw new Error(`DB Insert Error for ${questionId}. Details: ${error.message}`);
                             }
                             console.log(`DB insert successful for ${questionId}.`);
@@ -802,7 +799,7 @@ async function uploadAudioToSupabase(file, partNumber) {
                     const successfulCount = recordedCount - failedSubmissions.length;
 
                     if (failedSubmissions.length > 0) {
-                         // แสดงข้อความแจ้งเตือนที่ชัดเจนขึ้น
+                         // แสดงข้อความแจ้งเตือน
                          showAlert(`ส่งคำตอบสำเร็จ ${successfulCount} ข้อ แต่มี ${failedSubmissions.length} ข้อที่เกิดข้อผิดพลาดในการอัปโหลด/บันทึกข้อมูล (โปรดดู Console Log เพื่อดูรายละเอียด)`, 'warning');
                     } else {
                         showAlert('ส่งคำตอบและไฟล์เสียงสำเร็จเรียบร้อยแล้ว!', 'success');
