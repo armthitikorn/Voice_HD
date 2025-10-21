@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="th">
 <head>
 <meta charset="utf-8"/>
@@ -306,51 +307,35 @@ const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-
-// --- Core Functions: Upload & Submission Logic ---
-
-/**
- * @description อัปโหลดไฟล์เสียงไปยัง Supabase Storage Bucket แบบแยกไฟล์
- * @param {File} file - ไฟล์เสียงที่สร้างจาก Blob
- * @param {string} partNumber - หมายเลข Part ปัจจุบัน (เช่น '1', '2', '3')
- * @returns {Promise<string>} Public URL ของไฟล์ที่อัปโหลด
- */
+// --- Upload Audio File to Supabase Storage Bucket ---
 async function uploadAudioToSupabase(file, partNumber) {
-    const bucketName = 'responses';
-    // ตั้งค่า path เป็น partX/ชื่อไฟล์.webm เพื่อจัดเก็บแยกตาม Part
-    const filePath = `part${partNumber}/${file.name}`; 
+    // ใช้ UUID เพื่อป้องกันชื่อไฟล์ซ้ำกัน
+    const fileExt = file.name.split('.').pop();
+    // Path จะถูกจัดเก็บใน bucket/partX/fileName
+    const filePath = `part${partNumber}/${file.name}`; // ใช้ชื่อไฟล์เดิมที่รวมชื่อผู้ใช้และ QID แล้ว
 
-    console.log('[Uploading] Starting upload for:', filePath);
-    
-    // Upload file
-    const { data: uploadData, error: uploadError } = await supabase.storage
-        .from(bucketName)
+    // 💡 การแก้ไข: เพิ่ม option upsert:true เพื่อให้สามารถอัพโหลดทับไฟล์เดิมได้
+    const { data, error } = await supabase.storage
+        .from('responses')
         .upload(filePath, file, {
             cacheControl: '3600',
-            upsert: false,
-            contentType: file.type || 'audio/webm'
+            upsert: true // อนุญาตให้อัพโหลดทับหากชื่อไฟล์ซ้ำ
         });
 
-    if (uploadError) {
-        throw new Error(`Upload Error: ${uploadError.message}`);
+    if (error) {
+        console.error('Upload error:', error.message);
+        throw new Error('เกิดข้อผิดพลาดในการอัปโหลดไฟล์เสียง');
     }
 
-    console.log('[Upload Complete] Uploaded file path:', uploadData.path);
-
-    // Get public URL
-    const { data: publicUrlData } = supabase.storage
-        .from(bucketName)
+    const { data: { publicUrl } } = supabase.storage
+        .from('responses')
         .getPublicUrl(filePath);
 
-    if (!publicUrlData || !publicUrlData.publicUrl) {
-        throw new Error("Could not retrieve public URL after upload.");
-    }
-    
-    console.log('Uploaded file URL:', publicUrlData.publicUrl);
-    return publicUrlData.publicUrl;
+    console.log('Uploaded file URL:', publicUrl);
+    return publicUrl;
 }
 
-        // --- Questions Data (Updated with Q and A) ---
+// --- Questions Data (Updated with Q and A) ---
         const questions = {
             part1: [
                 { id: "P1Q1", part: 1, q: "แพงไปหน่อยนะ ลดราคาได้ไหม?",  a: "เข้าใจเลยค่ะว่ากังวลเรื่องราคา แต่สิ่งที่คุณกำลังลงทุนนี้คือ **คุณภาพ** และ **ผลลัพธ์ที่ยั่งยืน** ซึ่งเรามีบริการหลังการขายและฟีเจอร์ที่คู่แข่งไม่มี เมื่อเทียบกับมูลค่าที่คุณจะได้รับ ถือว่าคุ้มค่ามากค่ะ" },
@@ -482,15 +467,12 @@ async function uploadAudioToSupabase(file, partNumber) {
             }, 5000);
         }
 
-        /**
-         * @description สร้างชื่อไฟล์ที่ไม่ซ้ำกันสำหรับแต่ละคำถาม
-         * @param {string} questionId - รหัสคำถาม (เช่น P1Q1)
-         * @returns {string} ชื่อไฟล์ (เช่น Tk_test01_P1Q1_1761050405227.webm)
-         */
         function generateFileName(questionId) {
+            // ใช้ questionId และ timestamp เพื่อให้ชื่อไฟล์ไม่ซ้ำกัน และระบุ part ได้ง่ายขึ้น
+            const partNumber = questionId.substring(1, 2);
             const userName = inputUserName.value.trim().replace(/[^a-zA-Z0-9ก-ฮเ-์]/g, '_');
             const timestamp = Date.now();
-            return `${userName}_${questionId}_${timestamp}.webm`;
+            return `${currentPart}/${userName}_${questionId}_${timestamp}.webm`;
         }
 
         function saveUserName() {
@@ -681,7 +663,7 @@ async function uploadAudioToSupabase(file, partNumber) {
             }
         };
 
-        // --- Submission & Upload (UPDATED LOGIC) ---
+        // --- Submission & Upload ---
 
         /**
          * @description ตรวจสอบว่ามีไฟล์เสียงที่บันทึกแล้วหรือไม่ เพื่อเปิดใช้งานปุ่มส่ง
@@ -695,32 +677,30 @@ async function uploadAudioToSupabase(file, partNumber) {
         }
 
         /**
-         * @description ส่งข้อมูลและไฟล์เสียงทั้งหมด (แยกส่งทีละข้อ)
+         * @description ส่งข้อมูลและไฟล์เสียงทั้งหมด
          */
         window.submitExam = function() {
-            if (!inputUserName.value.trim()) {
+            const userName = inputUserName.value.trim();
+            const partBlobs = audioBlobs[currentPart];
+            const partNumber = currentPart.replace('part', '');
+            const recordedCount = Object.keys(partBlobs).length;
+
+            if (!userName) {
                 showAlert('กรุณากรอกชื่อ-นามสกุล/รหัสพนักงานก่อนส่ง', 'warning');
                 return;
             }
             
-            const recordedCount = Object.keys(audioBlobs[currentPart]).length;
-
             if (recordedCount === 0) {
                 showAlert('กรุณาบันทึกเสียงอย่างน้อย 1 ข้อใน Part นี้ก่อนส่ง', 'warning');
                 return;
             }
             
-            if (!window.confirm(`คุณต้องการส่งคำตอบ Part ${currentPart.replace('part', '')} (บันทึกแล้ว ${recordedCount} ข้อ) ใช่หรือไม่?`)) {
+            if (!window.confirm(`คุณต้องการส่งคำตอบ Part ${partNumber} (บันทึกแล้ว ${recordedCount} ข้อ) ใช่หรือไม่?`)) {
                 return;
             }
 
-            const partBlobs = audioBlobs[currentPart];
-            const userName = inputUserName.value.trim();
-            const partNumber = currentPart.replace('part', '');
-
-            const submissionPromises = []; 
-
             loadingOverlay.style.display = 'flex';
+            const submissionPromises = [];
 
             // 1. วนลูปเพื่ออัปโหลดไฟล์เสียงและบันทึกข้อมูล 'ทีละข้อ'
             for (const questionId in partBlobs) {
@@ -736,34 +716,34 @@ async function uploadAudioToSupabase(file, partNumber) {
                     const submissionPromise = uploadAudioToSupabase(audioFile, partNumber)
                         .then(publicUrl => {
                             // 2. บันทึกข้อมูลการส่งของ 'คำถามเดียว' ไปยังตาราง submissions
+                            
+                            // ** โค้ดที่แก้ไข: ใช้ชื่อคอลัมน์ตาม Schema ของคุณ: audio_url, text, question_text, part_num **
                             return supabase
                                 .from('submissions')
                                 .insert([
                                     {
-                                        // *** การแก้ไขสำคัญ: ปรับชื่อคอลัมน์ให้ตรงกับ DB ของคุณ ***
-                                        // 1. ใช้ 'name' แทน 'user_name'
+                                        // คอลัมน์ 'name' สำหรับ ชื่อ-รหัสพนักงาน
                                         name: userName, 
                                         
-                                        // 2. ใช้ 'question_text' เพื่อเก็บสคริปต์คำตอบ (A)
-                                        question_text: questionObj.a, 
+                                        // คอลัมน์ 'audio_url' สำหรับ URL ไฟล์เสียงที่อัปโหลด
+                                        audio_url: publicUrl, 
                                         
-                                        // 3. บันทึก URL ไฟล์เสียง (ต้องมั่นใจว่าตารางของคุณมีคอลัมน์ชื่อ 'response_url')
-                                        response_url: publicUrl,
+                                        // คอลัมน์ 'text' สำหรับ Script คำตอบ (A)
+                                        text: questionObj.a, 
                                         
-                                        // 4. บันทึก ID คำถาม (ต้องมั่นใจว่าตารางของคุณมีคอลัมน์ชื่อ 'question_id')
-                                        question_id: questionId,
+                                        // คอลัมน์ 'question_text' สำหรับ คำถาม (Q)
+                                        question_text: questionObj.q, 
 
-                                        // 5. บันทึก Part ID (ต้องมั่นใจว่าตารางของคุณมีคอลัมน์ชื่อ 'part_id')
-                                        part_id: partNumber,
-
+                                        // คอลัมน์ 'part_num' สำหรับ Part Number (1, 2, 3)
+                                        part_num: partNumber,
+                                        
+                                        // คอลัมน์ 'submitted_at' สำหรับเวลาที่ส่ง
                                         submitted_at: new Date().toISOString()
                                     }
                                 ]);
                         })
                         .then(({ error }) => {
                             if (error) {
-                                // ถ้าเกิด Error ในการ Insert (เช่น คอลัมน์ที่เพิ่มไปใหม่ยังไม่มีใน DB)
-                                // ให้ลองตรวจสอบว่าคอลัมน์ response_url, question_id, part_id มีใน DB แล้วหรือไม่
                                 console.error(`DB Insert Error for ${questionId}:`, error);
                                 throw new Error(`DB Insert Error for ${questionId}: ${error.message}`);
                             }
@@ -792,23 +772,22 @@ async function uploadAudioToSupabase(file, partNumber) {
                          showAlert(`ส่งคำตอบสำเร็จ ${successfulCount} ข้อ แต่มี ${failedSubmissions.length} ข้อที่เกิดข้อผิดพลาดในการอัปโหลด/บันทึกข้อมูล กรุณาตรวจสอบ Console Log และ Supabase Table อีกครั้ง`, 'warning');
                     } else {
                         showAlert('ส่งคำตอบและไฟล์เสียงสำเร็จเรียบร้อยแล้ว!', 'success');
+                        // ล้างข้อมูล Part ที่ส่งแล้วเมื่อสำเร็จทั้งหมด
+                        audioBlobs[currentPart] = {};
+                        renderQuestionList(); 
+                        submitBtn.disabled = true;
+                        
+                        // เปลี่ยนสถานะหน้าจอเป็นหน้าเลือก Part ใหม่
+                        document.getElementById('examArea').style.display = 'none';
+                        document.getElementById('currentQuestionTitle').textContent = 'ส่งงานสำเร็จ';
+                        document.getElementById('questionPrompt').textContent = 'กรุณาเลือก Part อื่นเพื่อทำแบบทดสอบต่อ';
+                        document.getElementById('requiredAnswer').textContent = '';
                     }
-                    
-                    // ล้างข้อมูล Part ที่ส่งแล้ว
-                    audioBlobs[currentPart] = {};
-                    renderQuestionList(); 
-                    submitBtn.disabled = true;
-                    
-                    // เปลี่ยนสถานะหน้าจอเป็นหน้าเลือก Part ใหม่
-                    document.getElementById('examArea').style.display = 'none';
-                    document.getElementById('currentQuestionTitle').textContent = 'ส่งงานสำเร็จ';
-                    document.getElementById('questionPrompt').textContent = 'กรุณาเลือก Part อื่นเพื่อทำแบบทดสอบต่อ';
-                    document.getElementById('requiredAnswer').textContent = '';
                 })
                 .catch(error => {
+                    console.error('Final Submission Error:', error);
                     loadingOverlay.style.display = 'none';
-                    console.error('Final Submission Failure:', error);
-                    showAlert('เกิดข้อผิดพลาดที่ไม่คาดคิดในการส่งข้อมูล', 'warning');
+                    showAlert('เกิดข้อผิดพลาดที่ไม่คาดคิดในการดำเนินการส่งข้อมูลทั้งหมด', 'warning');
                 });
         };
         
