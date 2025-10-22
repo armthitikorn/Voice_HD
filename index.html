@@ -687,7 +687,7 @@ async function uploadAudioToSupabase(fileBlob, questionId, partKey) {
                             // 2. เตรียมข้อมูลสำหรับบันทึกใน DB
                             // *** ใช้คอลัมน์เดิมตามที่ผู้ใช้ยืนยันว่าทำงานได้ปกติ ***
                             responsesToInsert.push({
-                                user_id: userId,
+                                user_id: user,
                                 audio_url: publicUrl,
                                 // หากตารางเดิมของคุณมีคอลัมน์อื่นอีก เช่น text, created_at
                                 // คุณอาจต้องเพิ่มเข้ามาตรงนี้ แต่ต้องใช้ชื่อเดิมเท่านั้น
