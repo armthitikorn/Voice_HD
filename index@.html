@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-
 <html lang="th">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>แบบทดสอบการพูดและการบันทึกเสียง</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&amp;display=swap" rel="stylesheet"/>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบการพูดและการบันทึกเสียง</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
         body {
             font-family: 'Sarabun', sans-serif;
             background-color: #f4f7f6;
@@ -219,114 +218,107 @@
             color: #007bff;
             font-weight: 700;
         }
-    
-@media (max-width: 768px) {
-  .container {
-    padding: 15px !important;
-  }
-  .user-info, .part-selection {
-    flex-direction: column !important;
-    gap: 10px !important;
-  }
-  .exam-area {
-    flex-direction: column !important;
-  }
-  .question-list {
-    flex: 1 1 100% !important;
-    max-height: 200px !important;
-  }
-  .question-content {
-    padding: 15px !important;
-  }
-  .recording-area button {
-    width: 100% !important;
-  }
-  .controls {
-    flex-direction: column !important;
-    gap: 10px !important;
-  }
-  #submitBtn {
-    width: 100% !important;
-  }
-}
-</style>
+    </style>
 </head>
 <body>
-<div class="container">
-<header>
-<h1>ระบบบันทึกเสียงแบบทดสอบ (Q&amp;A Script)</h1>
-<p>โจทย์: พนักงานอ่าน **คำถาม (Q)** ในใจ และพูด **คำตอบ (A)** ออกมาเพื่อบันทึกเสียง</p>
-</header>
-<div class="alert" id="mainAlert"></div>
-<div class="user-info">
-<label for="inputUserName">ชื่อ-นามสกุล/รหัสพนักงาน:</label>
-<input id="inputUserName" placeholder="กรุณากรอกชื่อ-รหัสพนักงาน" type="text"/>
-</div>
-<div class="part-selection">
-<button class="part-button" id="btnPart1" onclick="loadPart('part1')">Part 1 (30 ข้อ)</button>
-<button class="part-button" id="btnPart2" onclick="loadPart('part2')">Part 2 (30 ข้อ)</button>
-<button class="part-button" id="btnPart3" onclick="loadPart('part3')">Part 3 (30 ข้อ)</button>
-</div>
-<div class="exam-area" id="examArea" style="display: none;">
-<div class="question-list" id="questionList">
-<!-- รายการคำถามจะถูกสร้างขึ้นที่นี่ -->
-</div>
-<div class="question-content">
-<h3 id="currentQuestionTitle">กรุณาเลือก Part ที่ต้องการทำ</h3>
-<!-- โจทย์ (Q) -->
-<div class="prompt-area">
-<h4 class="font-bold text-lg text-orange-700">คำถาม (โจทย์ที่ลูกค้าถาม):</h4>
-<p class="text-xl font-medium text-gray-800" id="questionPrompt">คำแนะนำ: เลือก Part ด้านบนเพื่อเริ่มทำแบบทดสอบ</p>
-</div>
-<!-- สคริปต์คำตอบที่ต้องพูด (A) -->
-<div class="response-area">
-<h4 class="font-bold text-lg text-green-700">คำตอบที่ต้องพูด (Script สำหรับบันทึก):</h4>
-<p class="text-xl text-gray-900 font-semibold italic" id="requiredAnswer">เมื่อเลือก Part แล้ว สคริปต์คำตอบจะปรากฏที่นี่</p>
-</div>
-<div class="recording-area">
-<p id="recordingStatus">สถานะ: ยังไม่ได้เริ่มบันทึกเสียง</p>
-<button id="startRecBtn" onclick="handleStartRecording()">เริ่มบันทึกเสียง (Rec)</button>
-<button disabled="" id="stopRecBtn" onclick="handleStopRecording()">หยุดบันทึก (Stop)</button>
-<audio controls="" id="playbackAudio"></audio>
-</div>
-<!-- ปุ่มถูกซ่อนตามคำขอเพื่อให้ใช้การคลิกที่รายการด้านซ้ายแทน -->
-<div class="controls">
-<button id="prevBtn" onclick="prevQuestion()" style="display: none;">← ก่อนหน้า</button>
-<button id="nextBtn" onclick="nextQuestion()" style="display: none;">ถัดไป →</button>
-</div>
-</div>
-</div>
-<button disabled="" id="submitBtn" onclick="submitExam()">ส่งคำตอบทั้งหมด</button>
-</div>
-<div class="loading-overlay" id="loadingOverlay">
+
+    <div class="container">
+        <header>
+            <h1>ระบบบันทึกเสียงแบบทดสอบ (Q&A Script)</h1>
+            <p>โจทย์: พนักงานอ่าน **คำถาม (Q)** ในใจ และพูด **คำตอบ (A)** ออกมาเพื่อบันทึกเสียง</p>
+        </header>
+
+        <div class="alert" id="mainAlert"></div>
+        
+        <div class="user-info">
+            <label for="inputUserName">ชื่อ-นามสกุล/รหัสพนักงาน:</label>
+            <input type="text" id="inputUserName" placeholder="กรุณากรอกชื่อ-รหัสพนักงาน">
+        </div>
+
+        <div class="part-selection">
+            <button class="part-button" id="btnPart1" onclick="loadPart('part1')">Part 1 (30 ข้อ)</button>
+            <button class="part-button" id="btnPart2" onclick="loadPart('part2')">Part 2 (30 ข้อ)</button>
+            <button class="part-button" id="btnPart3" onclick="loadPart('part3')">Part 3 (30 ข้อ)</button>
+        </div>
+
+        <div class="exam-area" id="examArea" style="display: none;">
+            <div class="question-list" id="questionList">
+                </div>
+            <div class="question-content">
+                <h3 id="currentQuestionTitle">กรุณาเลือก Part ที่ต้องการทำ</h3>
+                
+                <div class="prompt-area">
+                    <h4 class="font-bold text-lg text-orange-700">คำถาม (โจทย์ที่ลูกค้าถาม):</h4>
+                    <p id="questionPrompt" class="text-xl font-medium text-gray-800">คำแนะนำ: เลือก Part ด้านบนเพื่อเริ่มทำแบบทดสอบ</p>
+                </div>
+
+                <div class="response-area">
+                    <h4 class="font-bold text-lg text-green-700">คำตอบที่ต้องพูด (Script สำหรับบันทึก):</h4>
+                    <p id="requiredAnswer" class="text-xl text-gray-900 font-semibold italic">เมื่อเลือก Part แล้ว สคริปต์คำตอบจะปรากฏที่นี่</p>
+                </div>
+
+
+                <div class="recording-area">
+                    <p id="recordingStatus">สถานะ: ยังไม่ได้เริ่มบันทึกเสียง</p>
+                    <button id="startRecBtn" onclick="handleStartRecording()">เริ่มบันทึกเสียง (Rec)</button>
+                    <button id="stopRecBtn" onclick="handleStopRecording()" disabled>หยุดบันทึก (Stop)</button>
+                    
+                    <audio id="playbackAudio" controls></audio>
+                </div>
+                
+                <div class="controls">
+                    <button id="prevBtn" onclick="prevQuestion()" style="display: none;">&larr; ก่อนหน้า</button>
+                    <button id="nextBtn" onclick="nextQuestion()" style="display: none;">ถัดไป &rarr;</button>
+                </div>
+            </div>
+        </div>
+        
+        <button id="submitBtn" onclick="submitExam()" disabled>ส่งคำตอบทั้งหมดใน Part ปัจจุบัน</button>
+
+    </div>
+    
+    <div class="loading-overlay" id="loadingOverlay">
         กำลังอัปโหลดไฟล์เสียง... โปรดรอสักครู่
     </div>
-<script type="module">
+
+    <script type="module">
 
 // --- Supabase Imports & Config ---
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 import { v4 as uuidv4 } from 'https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/esm-browser/index.js';
 
+// **โปรดตรวจสอบและแทนที่ด้วย Key ที่ถูกต้องของคุณ**
 const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // --- Upload Audio File to Supabase Storage Bucket ---
-async function uploadAudioToSupabase(file) {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${uuidv4()}.${fileExt}`;
-    const filePath = `${fileName}`;
+/**
+ * @description อัปโหลดไฟล์เสียงไปยัง Supabase Storage และส่งคืน URL สาธารณะ
+ * @param {Blob} fileBlob - ไฟล์เสียงแบบ Blob
+ * @param {string} questionId - ID ของคำถาม (e.g., P1Q1)
+ * @returns {Promise<string|null>} URL สาธารณะของไฟล์ที่อัปโหลด
+ */
+async function uploadAudioToSupabase(fileBlob, questionId) {
+    const userName = inputUserName.value.trim().replace(/[^a-zA-Z0-9ก-ฮเ-์]/g, '_');
+    const partNum = currentPart.replace('part', '');
+    // ใช้ webm เพราะเป็น mimeType ที่ใช้ตอนบันทึก
+    const fileName = `${userName}_P${partNum}_${questionId}_${Date.now()}.webm`; 
+    // เก็บไฟล์แยกเป็น Part/Question
+    const filePath = `${currentPart}/${questionId}/${fileName}`; 
+
+    const file = new File([fileBlob], fileName, { type: 'audio/webm' });
 
     const { data, error } = await supabase.storage
         .from('responses')
         .upload(filePath, file, {
             cacheControl: '3600',
-            upsert: false
+            upsert: false // ไม่ต้องอัปเดต ถ้าไฟล์มีอยู่แล้ว
         });
 
     if (error) {
-        console.error('Upload error:', error.message);
-        alert('เกิดข้อผิดพลาดในการอัปโหลดไฟล์เสียง');
+        console.error(`Upload error for ${fileName}:`, error.message);
+        // สามารถจัดการ error ที่ละเอียดขึ้นที่นี่
         return null;
     }
 
@@ -334,37 +326,10 @@ async function uploadAudioToSupabase(file) {
         .from('responses')
         .getPublicUrl(filePath);
 
-    console.log('Uploaded file URL:', publicUrl);
+    console.log(`Uploaded file URL for ${questionId}:`, publicUrl);
     return publicUrl;
 }
 
-// --- ฟังก์ชันส่งคำตอบพร้อมอัปโหลดเสียง ---
-async function submitResponse(currentUserId, recordedBlob) {
-    try {
-        const audioFile = new File([recordedBlob], "response.wav", { type: "audio/wav" });
-        const publicUrl = await uploadAudioToSupabase(audioFile);
-
-        const { error: insertError } = await supabase
-            .from('submissions')
-            .insert([
-                {
-                    user_id: currentUserId,
-                    audio_url: publicUrl,
-                    submitted_at: new Date().toISOString()
-                }
-            ]);
-
-        if (insertError) {
-            console.error('Database insert error:', insertError.message);
-            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-        } else {
-            alert('ส่งคำตอบเรียบร้อยแล้ว!');
-        }
-    } catch (err) {
-        console.error('Unexpected error:', err);
-        alert('เกิดข้อผิดพลาดที่ไม่คาดคิด');
-    }
-}
 
         // --- Questions Data (Updated with Q and A) ---
         const questions = {
@@ -498,11 +463,14 @@ async function submitResponse(currentUserId, recordedBlob) {
             }, 5000);
         }
 
-        function generateFileName(questionId) {
-            const userName = inputUserName.value.trim().replace(/[^a-zA-Z0-9ก-ฮเ-์]/g, '_');
-            const timestamp = Date.now();
-            return `${userName}_${questionId}_${timestamp}.webm`;
-        }
+        /**
+         * @description ฟังก์ชันที่ไม่ได้ใช้แล้ว เนื่องจากเปลี่ยนไปใช้การอัปโหลดผ่าน Supabase แทน
+         * function generateFileName(questionId) {
+         * const userName = inputUserName.value.trim().replace(/[^a-zA-Z0-9ก-ฮเ-์]/g, '_');
+         * const timestamp = Date.now();
+         * return `${userName}_${questionId}_${timestamp}.webm`;
+         * }
+         */
 
         function saveUserName() {
             localStorage.setItem('examUserName', inputUserName.value.trim());
@@ -590,8 +558,7 @@ async function submitResponse(currentUserId, recordedBlob) {
                 }
                 // ถ้าผู้ใช้กดยืนยันให้หยุดบันทึก
                 if (mediaRecorder.state === 'recording') {
-                     mediaRecorder.stop();
-                     mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                     handleStopRecording(false); // หยุดบันทึกโดยไม่บันทึก Blob
                 }
             }
             displayQuestion(index);
@@ -620,6 +587,9 @@ async function submitResponse(currentUserId, recordedBlob) {
             // อัพเดทปุ่ม Part
             document.querySelectorAll('.part-button').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btn${partKey.charAt(0).toUpperCase() + partKey.slice(1)}`).classList.add('active');
+
+            // อัปเดตข้อความปุ่มส่ง
+            submitBtn.textContent = `ส่งคำตอบทั้งหมดใน Part ${partKey.replace('part', '')}`;
 
             displayQuestion(currentIndex);
         };
@@ -669,6 +639,9 @@ async function submitResponse(currentUserId, recordedBlob) {
                     startRecBtn.disabled = false;
                     stopRecBtn.disabled = true;
                     
+                    // ปิด Track ของ Stream เพื่อปล่อยไมโครโฟน
+                    stream.getTracks().forEach(track => track.stop());
+
                     // อัพเดทรายการคำถามและสถานะปุ่มส่ง
                     renderQuestionList(); 
                 };
@@ -687,8 +660,7 @@ async function submitResponse(currentUserId, recordedBlob) {
         window.handleStopRecording = function() {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
-                // ปิด Track ของ Stream เพื่อปล่อยไมโครโฟน
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                // stream.getTracks().forEach(track => track.stop()); // ถูกย้ายไปที่ mediaRecorder.onstop
             }
         };
 
@@ -706,78 +678,77 @@ async function submitResponse(currentUserId, recordedBlob) {
         }
 
         /**
-         * @description ฟังก์ชันจำลองการอัปโหลดไฟล์เสียงไปยังเซิร์ฟเวอร์
-         * @param {Object} blobs - Object ที่มี Question ID เป็น key และ Blob เป็น value
+         * @description อัปโหลดไฟล์เสียงและบันทึกข้อมูลแยกเป็นรายข้อ
          */
-        function uploadBlobs(blobs) {
-            return new Promise((resolve, reject) => {
-                loadingOverlay.style.display = 'flex';
-                
-                const totalFiles = Object.keys(blobs).length;
-                let uploadedCount = 0;
-                
-                if (totalFiles === 0) {
-                     loadingOverlay.style.display = 'none';
-                     resolve();
-                     return;
-                }
+        async function uploadAndSubmitAllResponses(blobs) {
+            loadingOverlay.style.display = 'flex';
+            const responsesToInsert = [];
+            const uploadPromises = [];
+            const partNum = parseInt(currentPart.replace('part', ''));
+            const userId = inputUserName.value.trim();
 
-                // จำลองการอัปโหลดไฟล์ทีละไฟล์
-                for (const questionId in blobs) {
-                    const blob = blobs[questionId];
-                    const fileName = generateFileName(questionId);
-                    
-                    // 💡 โค้ดจริง: ใช้ fetch หรือ axios ที่นี่ เพื่อส่งไฟล์ไปยัง API ปลายทาง
-                    /* const formData = new FormData();
-                    formData.append('audioFile', blob, fileName);
-                    formData.append('questionId', questionId);
-                    formData.append('userName', inputUserName.value.trim());
+            for (const questionId in blobs) {
+                const blob = blobs[questionId];
 
-                    fetch('YOUR_UPLOAD_API_ENDPOINT', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new new Error('Upload failed');
-                        return response.json();
-                    })
-                    .then(() => {
-                        uploadedCount++;
-                        if (uploadedCount === totalFiles) {
-                            resolve();
+                // 1. อัปโหลดไฟล์
+                const uploadPromise = uploadAudioToSupabase(blob, questionId)
+                    .then(publicUrl => {
+                        if (publicUrl) {
+                            // 2. เตรียมข้อมูลสำหรับบันทึกใน DB
+                            responsesToInsert.push({
+                                user_id: userId,
+                                part_number: partNum,
+                                question_id: questionId,
+                                audio_url: publicUrl,
+                                submitted_at: new Date().toISOString()
+                            });
+                        } else {
+                            // การอัปโหลดล้มเหลวสำหรับข้อนี้
+                            console.error(`Skipping database insert for ${questionId} due to upload failure.`);
                         }
                     })
-                    .catch(error => {
-                        reject(error);
+                    .catch(err => {
+                        console.error(`Upload failed for ${questionId}:`, err);
+                        // ไม่ต้องโยน error ออกไปทั้งหมด เพื่อให้ข้ออื่นยังสามารถอัปโหลดได้
                     });
-                    */
-                    
-                    // 💡 โค้ดจำลอง: หน่วงเวลา 0.5 วินาทีต่อไฟล์
-                    setTimeout(() => {
-                        console.log(`[Mock Upload] ไฟล์ ${fileName} อัปโหลดสำเร็จ`);
-                        uploadedCount++;
-                        if (uploadedCount === totalFiles) {
-                            resolve();
-                        }
-                    }, 500); 
+
+                uploadPromises.push(uploadPromise);
+            }
+
+            // รอให้อัปโหลดทั้งหมดเสร็จสิ้น (ไม่ว่าจะสำเร็จหรือล้มเหลว)
+            await Promise.all(uploadPromises);
+
+            if (responsesToInsert.length > 0) {
+                // 3. บันทึกข้อมูลลงในตาราง Supabase
+                const { error: insertError } = await supabase
+                    .from('submissions') // ตรวจสอบว่ามีตารางชื่อ 'submissions' และมี field เหล่านี้
+                    .insert(responsesToInsert);
+
+                if (insertError) {
+                    console.error('Database insert error:', insertError.message);
+                    showAlert('เกิดข้อผิดพลาดในการบันทึกข้อมูลลงฐานข้อมูล', 'warning');
+                    return false;
                 }
-            })
-            .finally(() => {
-                loadingOverlay.style.display = 'none';
-            });
+            } else {
+                 showAlert('ไม่พบไฟล์เสียงที่อัปโหลดสำเร็จสำหรับบันทึกในฐานข้อมูล', 'warning');
+                 return false;
+            }
+
+            return true;
         }
+
 
         /**
          * @description ส่งข้อมูลและไฟล์เสียงทั้งหมด
-         * * 💡 การแก้ไขที่สำคัญ: ลบการตรวจสอบว่าต้องทำครบทุกข้อออก
          */
-        window.submitExam = function() {
+        window.submitExam = async function() {
             if (!inputUserName.value.trim()) {
                 showAlert('กรุณากรอกชื่อ-นามสกุล/รหัสพนักงานก่อนส่ง', 'warning');
                 return;
             }
             
             const recordedCount = Object.keys(audioBlobs[currentPart]).length;
+            const totalQuestions = questions[currentPart].length;
 
             if (recordedCount === 0) {
                 showAlert('กรุณาบันทึกเสียงอย่างน้อย 1 ข้อใน Part นี้ก่อนส่ง', 'warning');
@@ -789,25 +760,25 @@ async function submitResponse(currentUserId, recordedBlob) {
                 return;
             }
 
-            uploadBlobs(audioBlobs[currentPart])
-                .then(() => {
-                    showAlert('ส่งคำตอบและไฟล์เสียงสำเร็จเรียบร้อยแล้ว!', 'success');
-                    // ล้างข้อมูล Part ที่ส่งแล้ว
-                    audioBlobs[currentPart] = {};
-                    renderQuestionList(); 
-                    submitBtn.disabled = true;
-                    
-                    // เปลี่ยนสถานะหน้าจอเป็นหน้าเลือก Part ใหม่
-                    document.getElementById('examArea').style.display = 'none';
-                    document.getElementById('currentQuestionTitle').textContent = 'ส่งงานสำเร็จ';
-                    document.getElementById('questionPrompt').textContent = 'กรุณาเลือก Part อื่นเพื่อทำแบบทดสอบต่อ';
-                    document.getElementById('requiredAnswer').textContent = '';
-                    
-                })
-                .catch(error => {
-                    console.error('Submission Error:', error);
-                    showAlert('เกิดข้อผิดพลาดในการส่งข้อมูล/ไฟล์เสียง', 'warning');
+            // เริ่มกระบวนการอัปโหลดและส่งข้อมูล
+            const success = await uploadAndSubmitAllResponses(audioBlobs[currentPart])
+                .finally(() => {
+                    loadingOverlay.style.display = 'none';
                 });
+            
+            if (success) {
+                showAlert(`ส่งคำตอบและไฟล์เสียง Part ${currentPart.replace('part', '')} จำนวน ${recordedCount} ข้อ สำเร็จเรียบร้อยแล้ว!`, 'success');
+                // ล้างข้อมูล Part ที่ส่งแล้ว
+                audioBlobs[currentPart] = {};
+                renderQuestionList(); 
+                submitBtn.disabled = true;
+                
+                // เปลี่ยนสถานะหน้าจอเป็นหน้าเลือก Part ใหม่
+                document.getElementById('examArea').style.display = 'none';
+                document.getElementById('currentQuestionTitle').textContent = 'ส่งงานสำเร็จ';
+                document.getElementById('questionPrompt').textContent = 'กรุณาเลือก Part อื่นเพื่อทำแบบทดสอบต่อ';
+                document.getElementById('requiredAnswer').textContent = '';
+            }
         };
         
         // --- Initialization ---
@@ -817,10 +788,16 @@ async function submitResponse(currentUserId, recordedBlob) {
         if (storedUserName) {
             inputUserName.value = storedUserName;
         }
+
+        // หากมีการกรอกชื่อผู้ใช้ไว้แล้ว ให้ลองโหลด Part 1 อัตโนมัติ
+        if(inputUserName.value.trim()) {
+             // loadPart('part1'); // ไม่โหลดอัตโนมัติ ให้ผู้ใช้คลิกเลือกเอง
+        }
         
         // ตรวจสอบสถานะปุ่มส่งเมื่อโหลดหน้าเว็บ
         checkSubmitButtonStatus();
         
     </script>
+
 </body>
 </html>
