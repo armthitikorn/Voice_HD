@@ -281,11 +281,11 @@
         กำลังอัปโหลดไฟล์เสียง... โปรดรอสักครู่
     </div>
 
-   <script type="module">
+  <script type="module">
 
 // --- Supabase Imports & Config ---
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-// ไม่จำเป็นต้องใช้ uuidv4 อีกต่อไป เนื่องจาก user_id ถูกเปลี่ยนเป็น TEXT
+// *** ลบ: import { v4 as uuidv4 } ... ออกไปแล้ว ***
 
 const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
@@ -293,6 +293,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // --- Questions Data (90 ข้อ) ---
 const questions = {
+    // (ข้อมูล Part 1, Part 2, Part 3 ยังคงเดิม)
     part1: [
         { id: "P1Q1", part: 1, q: "แพงไปหน่อยนะ ลดราคาได้ไหม?",  a: "เข้าใจเลยค่ะว่ากังวลเรื่องราคา แต่สิ่งที่คุณกำลังลงทุนนี้คือ **คุณภาพ** และ **ผลลัพธ์ที่ยั่งยืน** ซึ่งเรามีบริการหลังการขายและฟีเจอร์ที่คู่แข่งไม่มี เมื่อเทียบกับมูลค่าที่คุณจะได้รับ ถือว่าคุ้มค่ามากค่ะ" },
         { id: "P1Q2", part: 1, q: "ตอนนี้ยุ่งอยู่ โทรมาใหม่ได้ไหม?",  a: "ขออนุญาตใช้เวลา **30 วินาที** สรุปสาระสำคัญที่คุณจะได้รับประโยชน์ได้ไหมคะ? หากไม่สนใจ ดิฉันจะวางสายทันทีค่ะ (รอการตอบรับ) ขอบคุณค่ะ สิ่งนี้จะช่วยคุณ..." },
@@ -428,31 +429,25 @@ function saveUserName() {
     checkSubmitButtonStatus();
 }
 
-// --- Supabase Core Functions (Updated) ---
+// --- Supabase Core Functions (Adjusted for 'voice_answers' table) ---
 
 /**
  * @description อัปโหลดไฟล์เสียงไปยัง Supabase Storage ด้วยโครงสร้าง Path ที่ถูกต้อง
- * @param {Blob} fileBlob - ข้อมูล Blob ของไฟล์เสียง
- * @param {string} questionId - ID ของคำถาม (เช่น P1Q1)
- * @param {string} partKey - Part Key (เช่น part1)
- * @param {string} userName - ชื่อ/รหัสพนักงาน
- * @returns {string} Public URL ของไฟล์ที่อัปโหลด
  */
 async function uploadAudioToSupabase(fileBlob, questionId, partKey, userName) {
-    const partNum = partKey.replace('part', 'P'); // e.g., 'part1' -> 'P1'
-    // สร้างชื่อไฟล์: John_D_P1_P1Q1_Timestamp.webm
+    // 💡 ปรับปรุงการสร้างชื่อไฟล์ให้ใช้ Question ID โดยตรง 
+    const partNum = partKey.replace('part', 'P');
     const safeUserName = userName.replace(/[^a-zA-Z0-9ก-ฮเ-์]/g, '_');
     const fileName = `${safeUserName}_${partNum}_${questionId}_${Date.now()}.webm`;
     
-    // Path จะถูกจัดโครงสร้าง: responses/part1/P1Q1/ชื่อไฟล์.webm
+    // Path: responses/part1/P1Q1/ชื่อไฟล์.webm
     const filePath = `${partKey}/${questionId}/${fileName}`; 
     
-    // สร้าง File object จาก Blob
     const audioFile = new File([fileBlob], fileName, { type: fileBlob.type });
 
     console.log(`Uploading file to: ${filePath}`);
 
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
         .from('responses')
         .upload(filePath, audioFile, {
             cacheControl: '3600',
@@ -460,7 +455,6 @@ async function uploadAudioToSupabase(fileBlob, questionId, partKey, userName) {
         });
 
     if (error) {
-        // หากอัปโหลดล้มเหลว ให้โยน Error เพื่อหยุดกระบวนการ
         console.error(`Upload error for ${questionId}:`, error.message);
         throw new Error(`Upload failed for ${questionId}: ${error.message}`);
     }
@@ -475,34 +469,40 @@ async function uploadAudioToSupabase(fileBlob, questionId, partKey, userName) {
 
 /**
  * @description อัปโหลดไฟล์เสียงทั้งหมดใน Part ปัจจุบันและส่ง URL เข้าฐานข้อมูลแบบ Batch Insert
- * @param {Object} blobs - Object ที่มี Question ID เป็น key และ Blob เป็น value
- * @param {string} partKey - Part Key (เช่น part1)
- * @param {string} userName - ชื่อ/รหัสพนักงาน
+ * 💡 ปรับให้ใช้ตาราง voice_answers และคอลัมน์ที่สอดคล้อง
  */
 async function uploadAndSubmitAllResponses(blobs, partKey, userName) {
     const questionIds = Object.keys(blobs);
     let responsesToInsert = [];
-    const partNum = parseInt(partKey.replace('part', '')); // 1, 2, or 3
+    // Part ID ในข้อมูลคำถามคือตัวเลข (1, 2, 3) 
+    const partNum = parseInt(partKey.replace('part', '')); 
 
-    // 1. อัปโหลดไฟล์ทั้งหมด
+    // 1. อัปโหลดไฟล์ทั้งหมดและเตรียมข้อมูล
     for (const questionId of questionIds) {
         const blob = blobs[questionId];
         
         try {
             const publicUrl = await uploadAudioToSupabase(blob, questionId, partKey, userName);
 
-            // 2. เก็บข้อมูลเพื่อ Insert เข้าตาราง submissions ตาม Field ที่ผู้ใช้ระบุ
+            // 2. เตรียมข้อมูลเพื่อ Insert เข้าตาราง 'voice_answers'
+            // 💡 การแปลง P1Q1 เป็นตัวเลข: เราจะใช้แค่ตัวเลขท้าย เช่น P1Q10 -> 10, P3Q90 -> 90
+            const questionNumber = parseInt(questionId.replace(/[a-zA-Z]+/, ''));
+            if (isNaN(questionNumber)) {
+                 console.warn(`Skipping insertion for ${questionId}: Could not parse question number.`);
+                 continue; 
+            }
+
             responsesToInsert.push({
-                user_name: userName,
-                exam_id: userName, // สมมติว่า exam_id ใช้ค่าเดียวกันกับ user_name
-                part_id: partNum,
-                question_id: questionId,
-                response_url: publicUrl,
-                submitted_at: new Date().toISOString()
+                user_id: userName, // 💡 ใช้ user_name เป็น user_id (เพราะ user_id ในตารางใหม่เป็น text ตามที่คุณตั้งใจจะใช้ชื่อ/รหัสพนักงาน)
+                exam_id: userName, // 💡 คอลัมน์ใหม่ตามที่ร้องขอ
+                part: partKey, // 💡 เปลี่ยนจาก part_id เป็น part (TEXT)
+                question_number: questionNumber, // 💡 เปลี่ยนจาก question_id เป็น question_number (INT)
+                audio_url: publicUrl, // 💡 เปลี่ยนจาก response_url เป็น audio_url
+                created_at: new Date().toISOString() // ใช้ created_at แทน submitted_at
+                // ไม่ต้องส่ง score และ review_status เพราะมีค่า NULL ได้
             });
 
         } catch (error) {
-            // หากมีข้อผิดพลาดในการอัปโหลดไฟล์ใดไฟล์หนึ่ง ให้หยุดและแจ้งผู้ใช้
             throw error; 
         }
     }
@@ -511,15 +511,16 @@ async function uploadAndSubmitAllResponses(blobs, partKey, userName) {
         return 0;
     }
 
-    // 3. Batch insert เข้าตาราง 'submissions'
-    console.log(`Inserting ${responsesToInsert.length} records into 'submissions'...`);
+    // 3. Batch insert เข้าตาราง 'voice_answers'
+    console.log(`Inserting ${responsesToInsert.length} records into 'voice_answers'...`);
     
+    // 💡 เปลี่ยนชื่อตารางเป็น 'voice_answers'
     const { error: insertError } = await supabase
-        .from('submissions')
+        .from('voice_answers')
         .insert(responsesToInsert);
 
     if (insertError) {
-        console.error('Database insert error:', insertError.message);
+        console.error('Database insert error (voice_answers):', insertError.message);
         throw new Error(`Database submission failed: ${insertError.message}`);
     }
 
@@ -527,7 +528,7 @@ async function uploadAndSubmitAllResponses(blobs, partKey, userName) {
 }
 
 
-// --- UI and Navigation Functions ---
+// --- UI and Navigation Functions (ไม่มีการเปลี่ยนแปลง) ---
         
 function renderQuestionList() {
     questionList.innerHTML = '';
@@ -616,7 +617,7 @@ window.loadPart = function(partKey) {
     displayQuestion(currentIndex);
 };
 
-// --- Recording Functions ---
+// --- Recording Functions (ไม่มีการเปลี่ยนแปลง) ---
 
 window.handleStartRecording = async function() {
     if (!inputUserName.value.trim()) {
@@ -673,7 +674,7 @@ window.handleStopRecording = function() {
     }
 };
 
-// --- Submission & Upload (Updated) ---
+// --- Submission & Upload (Final) ---
 
 function checkSubmitButtonStatus() {
     const hasUserName = inputUserName.value.trim() !== '';
@@ -723,7 +724,7 @@ window.submitExam = function() {
             loadingOverlay.style.display = 'none';
             console.error('Submission Error:', error);
             // แจ้งเตือนข้อผิดพลาดที่ชัดเจนยิ่งขึ้น
-            showAlert(`เกิดข้อผิดพลาดในการส่งข้อมูล/ไฟล์เสียง: ${error.message}. หากพบข้อผิดพลาด "invalid input syntax for type uuid" กรุณาเปลี่ยนชนิดข้อมูลคอลัมน์ที่เก็บรหัสพนักงานใน Supabase เป็น TEXT/VARCHAR`, 'warning');
+            showAlert(`เกิดข้อผิดพลาดในการส่งข้อมูล/ไฟล์เสียง: ${error.message}. โปรดตรวจสอบชื่อคอลัมน์และชนิดข้อมูลใน Supabase ตาราง 'voice_answers' อีกครั้ง`, 'warning');
         });
 };
 
