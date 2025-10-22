@@ -281,11 +281,10 @@
         กำลังอัปโหลดไฟล์เสียง... โปรดรอสักครู่
     </div>
 
-  <script type="module">
+ <script type="module">
 
 // --- Supabase Imports & Config ---
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-// *** ลบ: import { v4 as uuidv4 } ... ออกไปแล้ว ***
 
 const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
@@ -393,6 +392,7 @@ const questions = {
 };
 
 // --- Global Variables ---
+// audioBlobs จะยังใช้เก็บไฟล์เสียงชั่วคราวเผื่อการเล่นซ้ำ หรือส่งซ้ำกรณีที่ส่งครั้งแรกไม่สำเร็จ
 let audioBlobs = { part1: {}, part2: {}, part3: {} };
 let mediaRecorder;
 let audioChunks = [];
@@ -429,13 +429,12 @@ function saveUserName() {
     checkSubmitButtonStatus();
 }
 
-// --- Supabase Core Functions (Adjusted for 'voice_answers' table) ---
+// --- Supabase Core Functions (Refactored for Single Submission) ---
 
 /**
  * @description อัปโหลดไฟล์เสียงไปยัง Supabase Storage ด้วยโครงสร้าง Path ที่ถูกต้อง
  */
 async function uploadAudioToSupabase(fileBlob, questionId, partKey, userName) {
-    // 💡 ปรับปรุงการสร้างชื่อไฟล์ให้ใช้ Question ID โดยตรง 
     const partNum = partKey.replace('part', 'P');
     const safeUserName = userName.replace(/[^a-zA-Z0-9ก-ฮเ-์]/g, '_');
     const fileName = `${safeUserName}_${partNum}_${questionId}_${Date.now()}.webm`;
@@ -468,67 +467,45 @@ async function uploadAudioToSupabase(fileBlob, questionId, partKey, userName) {
 }
 
 /**
- * @description อัปโหลดไฟล์เสียงทั้งหมดใน Part ปัจจุบันและส่ง URL เข้าฐานข้อมูลแบบ Batch Insert
- * 💡 ปรับให้ใช้ตาราง voice_answers และคอลัมน์ที่สอดคล้อง
+ * @description อัปโหลดและส่งข้อมูลคำตอบสำหรับคำถามเดียวไปยัง Supabase
+ * 💡 ฟังก์ชันใหม่นี้จะถูกเรียกทันทีเมื่อหยุดบันทึกเสียง
  */
-async function uploadAndSubmitAllResponses(blobs, partKey, userName) {
-    const questionIds = Object.keys(blobs);
-    let responsesToInsert = [];
-    // Part ID ในข้อมูลคำถามคือตัวเลข (1, 2, 3) 
-    const partNum = parseInt(partKey.replace('part', '')); 
+async function submitSingleResponse(blob, question, userName, partKey) {
+    const questionId = question.id;
 
-    // 1. อัปโหลดไฟล์ทั้งหมดและเตรียมข้อมูล
-    for (const questionId of questionIds) {
-        const blob = blobs[questionId];
-        
-        try {
-            const publicUrl = await uploadAudioToSupabase(blob, questionId, partKey, userName);
+    // 1. อัปโหลดไฟล์
+    const publicUrl = await uploadAudioToSupabase(blob, questionId, partKey, userName);
 
-            // 2. เตรียมข้อมูลเพื่อ Insert เข้าตาราง 'voice_answers'
-            // 💡 การแปลง P1Q1 เป็นตัวเลข: เราจะใช้แค่ตัวเลขท้าย เช่น P1Q10 -> 10, P3Q90 -> 90
-            const questionNumber = parseInt(questionId.replace(/[a-zA-Z]+/, ''));
-            if (isNaN(questionNumber)) {
-                 console.warn(`Skipping insertion for ${questionId}: Could not parse question number.`);
-                 continue; 
-            }
-
-            responsesToInsert.push({
-                user_id: userName, // 💡 ใช้ user_name เป็น user_id (เพราะ user_id ในตารางใหม่เป็น text ตามที่คุณตั้งใจจะใช้ชื่อ/รหัสพนักงาน)
-                exam_id: userName, // 💡 คอลัมน์ใหม่ตามที่ร้องขอ
-                part: partKey, // 💡 เปลี่ยนจาก part_id เป็น part (TEXT)
-                question_number: questionNumber, // 💡 เปลี่ยนจาก question_id เป็น question_number (INT)
-                audio_url: publicUrl, // 💡 เปลี่ยนจาก response_url เป็น audio_url
-                created_at: new Date().toISOString() // ใช้ created_at แทน submitted_at
-                // ไม่ต้องส่ง score และ review_status เพราะมีค่า NULL ได้
-            });
-
-        } catch (error) {
-            throw error; 
-        }
+    // 2. เตรียมข้อมูลเพื่อ Insert เข้าตาราง 'voice_answers'
+    const questionNumber = parseInt(questionId.replace(/[a-zA-Z]+/, ''));
+    if (isNaN(questionNumber)) {
+        throw new Error(`Invalid question ID format: ${questionId}`);
     }
 
-    if (responsesToInsert.length === 0) {
-        return 0;
-    }
-
-    // 3. Batch insert เข้าตาราง 'voice_answers'
-    console.log(`Inserting ${responsesToInsert.length} records into 'voice_answers'...`);
+    const responseToInsert = {
+        user_id: userName, // TEXT
+        exam_id: userName, // TEXT
+        part: partKey, // TEXT
+        question_number: questionNumber, // INT4
+        audio_url: publicUrl, // TEXT
+        created_at: new Date().toISOString()
+    };
     
-    // 💡 เปลี่ยนชื่อตารางเป็น 'voice_answers'
+    // 3. Insert เข้าตาราง 'voice_answers' (Single Insert)
     const { error: insertError } = await supabase
         .from('voice_answers')
-        .insert(responsesToInsert);
+        .insert([responseToInsert]);
 
     if (insertError) {
         console.error('Database insert error (voice_answers):', insertError.message);
         throw new Error(`Database submission failed: ${insertError.message}`);
     }
-
-    return responsesToInsert.length;
+    
+    return questionNumber; // Return the submitted question number for feedback
 }
 
 
-// --- UI and Navigation Functions (ไม่มีการเปลี่ยนแปลง) ---
+// --- UI and Navigation Functions ---
         
 function renderQuestionList() {
     questionList.innerHTML = '';
@@ -539,6 +516,7 @@ function renderQuestionList() {
         item.setAttribute('onclick', `displayQuestionFromList(${index})`);
         
         const isRecorded = audioBlobs[currentPart][q.id];
+        // 💡 สถานะสีเขียว (✓) หมายถึงมีการบันทึกสำเร็จและส่งข้อมูลแล้ว
         const statusIcon = isRecorded ? 
             '<span class="status-icon" style="color: green;">✓</span>' :
             '<span class="status-icon" style="color: red;">•</span>';
@@ -551,7 +529,8 @@ function renderQuestionList() {
         
         questionList.appendChild(item);
     });
-    checkSubmitButtonStatus();
+    // ปุ่ม Submit จะถูกปิดการใช้งานเกือบตลอดเวลา เพราะเราส่งข้อมูลแบบทันที
+    checkSubmitButtonStatus(); 
 }
 
 function displayQuestion(index) {
@@ -571,7 +550,8 @@ function displayQuestion(index) {
         const blob = audioBlobs[currentPart][question.id];
         playbackAudio.src = URL.createObjectURL(blob);
         playbackAudio.style.display = 'block';
-        recordingStatus.textContent = 'สถานะ: บันทึกเสียงแล้ว (สามารถฟังหรือบันทึกใหม่ได้)';
+        // 💡 เปลี่ยนข้อความสถานะ
+        recordingStatus.textContent = 'สถานะ: ส่งข้อมูลสำเร็จแล้ว (สามารถฟังหรือบันทึกใหม่เพื่อส่งซ้ำได้)';
     } else {
         playbackAudio.src = '';
         recordingStatus.textContent = 'สถานะ: ยังไม่ได้เริ่มบันทึกเสียง';
@@ -588,6 +568,7 @@ window.displayQuestionFromList = function(index) {
         if (!confirm('กรุณาหยุดบันทึกเสียงก่อนเปลี่ยนไปทำข้ออื่น')) {
             return;
         }
+        // ถ้ามีการบันทึกอยู่ ให้หยุดและส่งข้อมูลก่อน
         if (mediaRecorder.state === 'recording') {
              mediaRecorder.stop();
              mediaRecorder.stream.getTracks().forEach(track => track.stop());
@@ -617,7 +598,7 @@ window.loadPart = function(partKey) {
     displayQuestion(currentIndex);
 };
 
-// --- Recording Functions (ไม่มีการเปลี่ยนแปลง) ---
+// --- Recording Functions (ปรับปรุง mediaRecorder.onstop) ---
 
 window.handleStartRecording = async function() {
     if (!inputUserName.value.trim()) {
@@ -634,29 +615,58 @@ window.handleStartRecording = async function() {
             audioChunks.push(event.data);
         };
 
+        // 💡 mediaRecorder.onstop จะทำงานและส่งข้อมูลทันที
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            audioChunks = [];
+            
+            const question = shuffledQuestions[currentIndex];
+            const questionId = question.id;
+            const userName = inputUserName.value.trim();
+            
+            // UI: แสดงสถานะการส่งข้อมูล
+            loadingOverlay.style.display = 'flex';
+            recordingStatus.textContent = 'สถานะ: กำลังอัปโหลดและส่งข้อมูล...';
+            
+            // 💡 เรียกฟังก์ชันส่งข้อมูลแบบเดี่ยวทันที
+            submitSingleResponse(audioBlob, question, userName, currentPart)
+                .then(questionNum => {
+                    // 1. Success UI
+                    loadingOverlay.style.display = 'none';
+                    // บันทึก Blob ไว้ใน cache หลังจากการส่งสำเร็จ เพื่อให้เล่นซ้ำได้
+                    audioBlobs[currentPart][questionId] = audioBlob; 
+                    
+                    playbackAudio.src = URL.createObjectURL(audioBlob);
+                    playbackAudio.style.display = 'block';
+                    recordingStatus.textContent = 'สถานะ: บันทึกและส่งข้อมูลสำเร็จแล้ว!';
+                    
+                    showAlert(`ส่ง Part ${currentPart.replace('part', '')} ข้อที่ ${questionNum} สำเร็จแล้ว!`, 'success');
+
+                })
+                .catch(error => {
+                    // 2. Error UI
+                    loadingOverlay.style.display = 'none';
+                    console.error('Submission Error:', error);
+                    // ไม่ต้องบันทึก Blob ใน cache ถ้าส่งล้มเหลว
+                    recordingStatus.textContent = 'สถานะ: เกิดข้อผิดพลาดในการส่งข้อมูล! กรุณาลองบันทึกใหม่';
+                    showAlert(`ส่งข้อมูลล้มเหลว: ${error.message}`, 'warning');
+                })
+                .finally(() => {
+                    startRecBtn.disabled = false;
+                    stopRecBtn.disabled = true;
+                    renderQuestionList(); // อัปเดตไอคอนในรายการคำถาม
+                });
+            
+            // ต้องหยุด Track ของ Stream เพื่อปล่อยการใช้ไมโครโฟน
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        };
+
         mediaRecorder.onstart = () => {
             recordingStatus.textContent = 'สถานะ: กำลังบันทึกเสียง...';
             startRecBtn.disabled = true;
             stopRecBtn.disabled = false;
             playbackAudio.style.display = 'none';
             playbackAudio.src = '';
-        };
-
-        mediaRecorder.onstop = () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            audioChunks = [];
-            
-            const questionId = shuffledQuestions[currentIndex].id;
-            audioBlobs[currentPart][questionId] = audioBlob;
-            
-            playbackAudio.src = URL.createObjectURL(audioBlob);
-            playbackAudio.style.display = 'block';
-            
-            recordingStatus.textContent = 'สถานะ: บันทึกเสียงแล้ว (สามารถฟังหรือบันทึกใหม่ได้)';
-            startRecBtn.disabled = false;
-            stopRecBtn.disabled = true;
-            
-            renderQuestionList(); 
         };
 
         mediaRecorder.start();
@@ -670,62 +680,33 @@ window.handleStartRecording = async function() {
 window.handleStopRecording = function() {
     if (mediaRecorder && mediaRecorder.state === 'recording') {
         mediaRecorder.stop();
-        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        // mediaRecorder.onstop จะจัดการเรื่องการส่งข้อมูลและ stream.stop() ต่อไป
     }
 };
 
 // --- Submission & Upload (Final) ---
 
 function checkSubmitButtonStatus() {
-    const hasUserName = inputUserName.value.trim() !== '';
-    const recordedCount = Object.keys(audioBlobs[currentPart]).length;
-    
-    submitBtn.disabled = !(hasUserName && recordedCount > 0);
+    // 💡 ปุ่ม Submit ถูกปิดการใช้งานถาวร เพราะเราส่งข้อมูลแบบทันทีที่หยุดบันทึก
+    submitBtn.disabled = true;
 }
 
 window.submitExam = function() {
-    const userName = inputUserName.value.trim();
-
-    if (!userName) {
-        showAlert('กรุณากรอกชื่อ-นามสกุล/รหัสพนักงานก่อนส่ง', 'warning');
-        return;
-    }
-    
     const recordedCount = Object.keys(audioBlobs[currentPart]).length;
 
     if (recordedCount === 0) {
-        showAlert('กรุณาบันทึกเสียงอย่างน้อย 1 ข้อใน Part นี้ก่อนส่ง', 'warning');
-        return;
+        // หากไม่มีคำตอบที่บันทึกไว้ใน cache (แปลว่าส่งสำเร็จหมดแล้ว)
+        showAlert('Part นี้ส่งข้อมูลครบถ้วนแล้ว! คุณสามารถเลือก Part อื่นเพื่อทำแบบทดสอบต่อได้เลย', 'success');
+    } else {
+        // หากมีคำตอบที่อยู่ใน cache (แปลว่าเคยส่งไม่สำเร็จ)
+        showAlert(`มีคำตอบ ${recordedCount} ข้อใน Part นี้ที่ยังไม่ได้ถูกส่ง/ส่งไม่สำเร็จ กรุณาไปที่ข้อเหล่านั้นแล้วบันทึก/ส่งใหม่อีกครั้ง`, 'warning');
     }
     
-    if (!window.confirm(`คุณต้องการส่งคำตอบ Part ${currentPart.replace('part', '')} (บันทึกแล้ว ${recordedCount} ข้อ) ใช่หรือไม่?`)) {
-        return;
-    }
-
-    loadingOverlay.style.display = 'flex';
-
-    // 💡 เรียกใช้ฟังก์ชันจริง
-    uploadAndSubmitAllResponses(audioBlobs[currentPart], currentPart, userName)
-        .then((submittedCount) => {
-            loadingOverlay.style.display = 'none';
-            showAlert(`ส่งคำตอบและไฟล์เสียงสำเร็จเรียบร้อยแล้ว! (${submittedCount} ข้อ)`, 'success');
-            
-            audioBlobs[currentPart] = {};
-            renderQuestionList(); 
-            submitBtn.disabled = true;
-            
-            document.getElementById('examArea').style.display = 'none';
-            document.getElementById('currentQuestionTitle').textContent = 'ส่งงานสำเร็จ';
-            document.getElementById('questionPrompt').textContent = 'กรุณาเลือก Part อื่นเพื่อทำแบบทดสอบต่อ';
-            document.getElementById('requiredAnswer').textContent = '';
-            
-        })
-        .catch(error => {
-            loadingOverlay.style.display = 'none';
-            console.error('Submission Error:', error);
-            // แจ้งเตือนข้อผิดพลาดที่ชัดเจนยิ่งขึ้น
-            showAlert(`เกิดข้อผิดพลาดในการส่งข้อมูล/ไฟล์เสียง: ${error.message}. โปรดตรวจสอบชื่อคอลัมน์และชนิดข้อมูลใน Supabase ตาราง 'voice_answers' อีกครั้ง`, 'warning');
-        });
+    // UI Reset หลังจากการตรวจสอบ
+    document.getElementById('examArea').style.display = 'none';
+    document.getElementById('currentQuestionTitle').textContent = 'ส่งงานสำเร็จ';
+    document.getElementById('questionPrompt').textContent = 'กรุณาเลือก Part อื่นเพื่อทำแบบทดสอบต่อ';
+    document.getElementById('requiredAnswer').textContent = '';
 };
 
 // --- Initialization ---
