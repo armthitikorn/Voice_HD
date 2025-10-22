@@ -734,15 +734,15 @@ async function uploadAudioToSupabase(file, partNumber) {
                     const audioFile = new File([audioBlob], fileName, { type: audioBlob.type || "audio/webm" });
 
                     // สร้าง Promise สำหรับการอัปโหลดและบันทึกข้อมูล
-                    const submissions_with_emailPromise = uploadAudioToSupabase(audioFile, partNumber)
-                        .then(publicUrl => {
+                    const submissionsPromise = uploadAudioToSupabase(audioFile, partNumber)
+                        .then(audiourl => {
                             // 2. บันทึกข้อมูลการส่งของ 'คำถามเดียว' ไปยังตาราง submissions
                             return supabase
-                                .from('submissions_with_email')
+                                .from('submissions')
                                 .insert([
                                     {
                                         user_name: name, 
-                                        exam_id: user_id,
+                                        exam_id: email,
                                         part_id: part_number, // ใช้หมายเลข Part
                                         question_id: question_text, // รหัสคำถาม
                                         response_url: audio_url,
@@ -762,20 +762,20 @@ async function uploadAudioToSupabase(file, partNumber) {
                             return { success: false, error: error.message }; 
                         });
 
-                    submissions_with_emailPromises.push(submissions_with_emailPromise);
+                    submissionsPromises.push(submissionsPromise);
                 }
             }
 
             // 3. รอให้การอัปโหลดและการบันทึกข้อมูลทั้งหมดเสร็จสมบูรณ์
-            Promise.all(submissions_with_emailPromises)
+            Promise.all(submissionsPromises)
                 .then(results => {
                     loadingOverlay.style.display = 'none';
                     
                     const failedSubmissions = results.filter(r => r && r.success === false);
-                    const successfulCount = recordedCount - failedsubmissions_with_email.length;
+                    const successfulCount = recordedCount - failedsubmissions.length;
 
-                    if (failedsubmissions_with_email.length > 0) {
-                         showAlert(`ส่งคำตอบสำเร็จ ${successfulCount} ข้อ แต่มี ${failedsubmissions_with_email.length} ข้อที่เกิดข้อผิดพลาดในการอัปโหลด/บันทึกข้อมูล`, 'warning');
+                    if (failedsubmissions.length > 0) {
+                         showAlert(`ส่งคำตอบสำเร็จ ${successfulCount} ข้อ แต่มี ${failedsubmissions.length} ข้อที่เกิดข้อผิดพลาดในการอัปโหลด/บันทึกข้อมูล`, 'warning');
                     } else {
                         showAlert('ส่งคำตอบและไฟล์เสียงสำเร็จเรียบร้อยแล้ว!', 'success');
                     }
