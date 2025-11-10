@@ -3,23 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แบบทดสอบการพูดและการบันทึกเสียง</title>
+    <title>แบบทดสอบการพูดและการบันทึกเสียง (Voice HD)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* --- Global Styles --- */
         body {
             font-family: 'Sarabun', sans-serif;
             background-color: #f4f7f6;
             margin: 0;
-            padding: 20px;
+            padding: 0; 
             color: #333;
+            min-height: 100vh;
         }
         .container {
             max-width: 1200px;
-            margin: auto;
+            margin: 20px auto; 
             background: #fff;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
         header {
             text-align: center;
@@ -31,192 +34,199 @@
             color: #007bff;
             font-weight: 700;
         }
-        .user-info {
-            display: flex;
-            gap: 15px;
+        h2 {
+            color: #007bff;
+            border-left: 4px solid #007bff;
+            padding-left: 10px;
+        }
+
+        /* --- Input and Part Selection --- */
+        .user-info, .part-selection {
             margin-bottom: 25px;
-            align-items: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
         }
-        .user-info label {
-            font-weight: 700;
-        }
-        .user-info input {
+        #inputUserName {
             padding: 10px;
+            max-width: 300px; 
             border: 1px solid #ccc;
-            border-radius: 6px;
-            flex-grow: 1;
+            border-radius: 4px;
+            box-sizing: border-box;
             font-size: 16px;
         }
-        .part-selection {
+        .part-buttons {
             display: flex;
             gap: 15px;
-            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
         .part-button {
+            flex: 1; 
+            min-width: 120px;
             padding: 12px 25px;
-            background-color: #28a745;
-            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid #007bff;
+            border-radius: 6px;
+            background-color: #fff;
+            color: #007bff;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .part-button:hover, .part-button.active {
+            background-color: #007bff;
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        /* --- Exam Area Layout (Responsive) --- */
+        #examArea {
+            display: grid;
+            grid-template-columns: 2fr 1fr; 
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .question-item {
+                font-size: 0.9em; 
+            }
+            #examArea {
+                grid-template-columns: 1fr; 
+            }
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+        }
+        
+        /* --- Question Panel --- */
+        .question-panel {
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .question-content, .required-answer {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 1.1em; 
+        }
+        .question-content {
+            background-color: #e0f7fa; 
+            border-left: 5px solid #00bcd4;
+        }
+        .required-answer {
+            background-color: #ffeccf;
+            border-left: 5px solid #ff9800;
+        }
+        
+        /* --- Controls & Status --- */
+        .recording-controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        #recordingStatus {
+            font-weight: 700;
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #007bff;
+        }
+        .btn {
+            padding: 12px 25px;
             border: none;
             border-radius: 8px;
+            color: white;
             cursor: pointer;
-            font-size: 16px;
             font-weight: 700;
-            transition: background-color 0.3s;
+            transition: opacity 0.2s, transform 0.2s;
+            font-size: 1em;
         }
-        .part-button:hover {
-            background-color: #1e7e34;
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
         }
-        .part-button.active {
-            background-color: #0056b3;
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
-        .exam-area {
-            display: flex; 
-            gap: 20px;
-            min-height: 500px;
+        .btn-danger { background-color: #dc3545; }
+        .btn-success { background-color: #28a745; }
+        .btn-primary { background-color: #007bff; margin-top: 20px; width: 100%;} 
+
+        #playbackControls {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            border-top: 1px solid #eee;
         }
-        .question-list {
-            flex: 0 0 250px;
-            background-color: #f8f9fa;
+        #playbackAudio {
+            flex-grow: 1;
+            min-width: 200px;
+        }
+        #sendQuestionBtn {
+            flex-shrink: 0;
+            font-size: 1.1em;
+        }
+
+        /* --- Question List Panel --- */
+        .question-list-panel {
             padding: 15px;
+            background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            max-height: 500px;
+            max-height: 600px;
             overflow-y: auto;
         }
         .question-item {
             padding: 10px;
-            margin-bottom: 5px;
-            border-radius: 4px;
+            border-bottom: 1px solid #eee;
             cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
+            transition: background-color 0.2s;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .question-item:hover {
-            background-color: #e9ecef;
-        }
-        .question-item.active {
-            background-color: #007bff;
-            color: white;
+        .question-item:hover, .question-item.active {
+            background-color: #e9f7ff;
             font-weight: 700;
+            border-left: 3px solid #007bff;
         }
         .status-icon {
-            font-size: 18px;
-            line-height: 1;
-            margin-left: 10px;
-        }
-        .question-content {
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        .question-content h3 {
-            margin-top: 0;
-            color: #dc3545;
+            font-size: 1.2em;
+            margin-left: 5px;
         }
         
-        /* สไตล์สำหรับ Q&A */
-        .prompt-area {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ff9800;
-            border-radius: 8px;
-            background-color: #fff3e0;
-        }
-        .response-area {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 2px solid #28a745;
-            border-radius: 8px;
-            background-color: #e8f5e9;
-        }
-        .response-area p {
-            font-size: 18px;
-            line-height: 1.6;
-            font-weight: 600; /* เน้นสคริปต์ให้อ่านง่าย */
-            white-space: pre-wrap;
-        }
-        .recording-area {
-            margin-top: 25px;
-            padding: 15px;
-            border: 1px dashed #007bff;
-            border-radius: 6px;
-            text-align: center;
-        }
-        .recording-area button {
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            transition: background-color 0.3s;
-        }
-        #startRecBtn {
-            background-color: #dc3545;
-            color: white;
-        }
-        #startRecBtn:hover {
-            background-color: #c82333;
-        }
-        #stopRecBtn {
-            background-color: #ffc107;
-            color: #333;
-        }
-        #stopRecBtn:hover {
-            background-color: #e0a800;
-        }
-        #playbackAudio {
-            width: 100%;
-            margin-top: 15px;
-        }
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        #submitBtn {
-            background-color: #28a745;
-            color: white;
-            padding: 15px 30px;
-            width: 100%;
-            margin-top: 30px;
-            font-size: 18px;
-        }
+        /* --- Alerts and Loading --- */
         .alert {
             padding: 15px;
             margin-bottom: 20px;
-            border-radius: 4px;
-            font-weight: 700;
+            border-radius: 8px;
             display: none;
+            font-weight: 700;
         }
-        .alert.warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-        .alert.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .loading-overlay {
+        .alert.info { background-color: #e7f7ff; color: #0056b3; border: 1px solid #b8daff; }
+        .alert.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert.warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        
+        #loadingOverlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            font-size: 24px;
+            flex-direction: column;
+            font-size: 1.8em;
             color: #007bff;
-            font-weight: 700;
         }
     </style>
 </head>
@@ -224,240 +234,192 @@
 
     <div class="container">
         <header>
-            <h1>ระบบบันทึกเสียงแบบทดสอบ (Q&A Script)</h1>
-            <p>โจทย์: พนักงานอ่าน **คำถาม (Q)** ในใจ และพูด **คำตอบ (A)** ออกมาเพื่อบันทึกเสียง</p>
+            <h1>แบบทดสอบการพูดและการบันทึกเสียง (Voice HD)</h1>
+            <p>กรุณาทำแบบทดสอบให้ครบ 90 ข้อ (3 Part) โดยบันทึกเสียงทีละข้อ และกดส่งเมื่อตรวจสอบไฟล์เสียงแล้ว</p>
         </header>
 
-        <div class="alert" id="mainAlert"></div>
-        
+        <div id="mainAlert" class="alert info"></div>
+
         <div class="user-info">
+            <h2>1. ข้อมูลผู้เข้าสอบ</h2>
             <label for="inputUserName">ชื่อ-นามสกุล/รหัสพนักงาน:</label>
-            <input type="text" id="inputUserName" placeholder="กรุณากรอกชื่อ-รหัสพนักงาน">
+            <input type="text" id="inputUserName" onchange="saveUserName()" placeholder="กรุณากรอกชื่อ-นามสกุล/รหัสพนักงาน" required>
         </div>
 
         <div class="part-selection">
-            <button class="part-button" id="btnPart1" onclick="loadPart('part1')">Part 1 (30 ข้อ)</button>
-            <button class="part-button" id="btnPart2" onclick="loadPart('part2')">Part 2 (30 ข้อ)</button>
-            <button class="part-button" id="btnPart3" onclick="loadPart('part3')">Part 3 (30 ข้อ)</button>
-        </div>
-
-        <div class="exam-area" id="examArea" style="display: none;">
-            <div class="question-list" id="questionList">
-                <!-- รายการคำถามจะถูกสร้างขึ้นที่นี่ -->
-            </div>
-            <div class="question-content">
-                <h3 id="currentQuestionTitle">กรุณาเลือก Part ที่ต้องการทำ</h3>
-                
-                <!-- โจทย์ (Q) -->
-                <div class="prompt-area">
-                    <h4 class="font-bold text-lg text-orange-700">คำถาม (โจทย์ที่ลูกค้าถาม):</h4>
-                    <p id="questionPrompt" class="text-xl font-medium text-gray-800">คำแนะนำ: เลือก Part ด้านบนเพื่อเริ่มทำแบบทดสอบ</p>
-                </div>
-
-                <!-- สคริปต์คำตอบที่ต้องพูด (A) -->
-                <div class="response-area">
-                    <h4 class="font-bold text-lg text-green-700">คำตอบที่ต้องพูด (Script สำหรับบันทึก):</h4>
-                    <p id="requiredAnswer" class="text-xl text-gray-900 font-semibold italic">เมื่อเลือก Part แล้ว สคริปต์คำตอบจะปรากฏที่นี่</p>
-                </div>
-
-
-                <div class="recording-area">
-                    <p id="recordingStatus">สถานะ: ยังไม่ได้เริ่มบันทึกเสียง</p>
-                    <button id="startRecBtn" onclick="handleStartRecording()">เริ่มบันทึกเสียง (Rec)</button>
-                    <button id="stopRecBtn" onclick="handleStopRecording()" disabled>หยุดบันทึก (Stop)</button>
-                    
-                    <audio id="playbackAudio" controls></audio>
-                </div>
-                
-                <!-- ปุ่มถูกซ่อนตามคำขอเพื่อให้ใช้การคลิกที่รายการด้านซ้ายแทน -->
-                <div class="controls">
-                    <button id="prevBtn" onclick="prevQuestion()" style="display: none;">&larr; ก่อนหน้า</button>
-                    <button id="nextBtn" onclick="nextQuestion()" style="display: none;">ถัดไป &rarr;</button>
-                </div>
+            <h2>2. เลือก Part ที่ต้องการทำแบบทดสอบ</h2>
+            <div class="part-buttons">
+                <button id="btnPart1" class="part-button" onclick="loadPart('part1')">Part 1 (30 ข้อ)</button>
+                <button id="btnPart2" class="part-button" onclick="loadPart('part2')">Part 2 (30 ข้อ)</button>
+                <button id="btnPart3" class="part-button" onclick="loadPart('part3')">Part 3 (30 ข้อ)</button>
             </div>
         </div>
-        
-        <button id="submitBtn" onclick="submitExam()" disabled>ส่งคำตอบทั้งหมด</button>
 
+        <div id="examArea" style="display: none;">
+            <div class="question-panel">
+                <h2 id="currentQuestionTitle">Part 1: คำถามข้อที่ 1</h2>
+                
+                <div class="question-content">
+                    <p><strong>คำถาม:</strong> <span id="questionPrompt">...</span></p>
+                </div>
+
+                <div class="required-answer">
+                    <p><strong>แนวทางคำตอบที่ต้องการ:</strong> <span id="requiredAnswer">...</span></p>
+                </div>
+
+                <p id="recordingStatus" style="font-weight: 700; margin-top: 20px;">สถานะ: ยังไม่ได้เริ่มบันทึกเสียง</p>
+
+                <div class="recording-controls">
+                    <button id="startRecBtn" class="btn btn-success" onclick="handleStartRecording()">เริ่มบันทึกเสียง</button>
+                    <button id="stopRecBtn" class="btn btn-danger" onclick="handleStopRecording()" disabled>หยุดบันทึก</button>
+                </div>
+
+                <div id="playbackControls">
+                    <audio id="playbackAudio" controls style="display: none;"></audio>
+                    <button id="sendQuestionBtn" onclick="handleSingleSubmission()" class="btn btn-success" style="display: none;" disabled>
+                        ส่งคำตอบข้อนี้ (บันทึกและส่ง)
+                    </button>
+                </div>
+
+                <button id="submitBtn" onclick="submitExam()" class="btn btn-primary" disabled>
+                    ส่งงาน Part (ส่งแล้ว 0/30 ข้อ)
+                </button>
+            </div>
+
+            <div class="question-list-panel">
+                <h3>รายการคำถาม</h3>
+                <div id="questionList">
+                    </div>
+            </div>
+        </div>
     </div>
     
-    <div class="loading-overlay" id="loadingOverlay">
-        กำลังอัปโหลดไฟล์เสียง... โปรดรอสักครู่
+    <div id="loadingOverlay">
+        <p>กำลังดำเนินการส่งข้อมูล... กรุณารอสักครู่</p>
     </div>
 
     <script type="module">
 
-// --- Supabase Imports & Config ---
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-import { v4 as uuidv4 } from 'https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/esm-browser/index.js';
+        // --- Supabase Imports & Config ---
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
-const supabase = createClient(supabaseUrl, supabaseKey);
+        const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
+        const supabase = createClient(supabaseUrl, supabaseKey);
 
-// --- Upload Audio File to Supabase Storage Bucket ---
-async function uploadAudioToSupabase(file) {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${uuidv4()}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    const { data, error } = await supabase.storage
-        .from('responses')
-        .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-        });
-
-    if (error) {
-        console.error('Upload error:', error.message);
-        alert('เกิดข้อผิดพลาดในการอัปโหลดไฟล์เสียง');
-        return null;
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-        .from('responses')
-        .getPublicUrl(filePath);
-
-    console.log('Uploaded file URL:', publicUrl);
-    return publicUrl;
-}
-
-// --- ฟังก์ชันส่งคำตอบพร้อมอัปโหลดเสียง ---
-async function submitResponse(currentUserId, recordedBlob) {
-    try {
-        const audioFile = new File([recordedBlob], "response.wav", { type: "audio/wav" });
-        const publicUrl = await uploadAudioToSupabase(audioFile);
-
-        const { error: insertError } = await supabase
-            .from('submissions')
-            .insert([
-                {
-                    user_id: currentUserId,
-                    audio_url: publicUrl,
-                    submitted_at: new Date().toISOString()
-                }
-            ]);
-
-        if (insertError) {
-            console.error('Database insert error:', insertError.message);
-            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-        } else {
-            alert('ส่งคำตอบเรียบร้อยแล้ว!');
-        }
-    } catch (err) {
-        console.error('Unexpected error:', err);
-        alert('เกิดข้อผิดพลาดที่ไม่คาดคิด');
-    }
-}
-
-        // --- Questions Data (Updated with Q and A) ---
+        // --- Questions Data (90 ข้อ) (Same as Original) ---
         const questions = {
-            part1: [
-                { id: "P1Q1", part: 1, q: "แพงไปหน่อยนะ ลดราคาได้ไหม?",  a: "เข้าใจเลยค่ะว่ากังวลเรื่องราคา แต่สิ่งที่คุณกำลังลงทุนนี้คือ **คุณภาพ** และ **ผลลัพธ์ที่ยั่งยืน** ซึ่งเรามีบริการหลังการขายและฟีเจอร์ที่คู่แข่งไม่มี เมื่อเทียบกับมูลค่าที่คุณจะได้รับ ถือว่าคุ้มค่ามากค่ะ" },
-                { id: "P1Q2", part: 1, q: "ตอนนี้ยุ่งอยู่ โทรมาใหม่ได้ไหม?",  a: "ขออนุญาตใช้เวลา **30 วินาที** สรุปสาระสำคัญที่คุณจะได้รับประโยชน์ได้ไหมคะ? หากไม่สนใจ ดิฉันจะวางสายทันทีค่ะ (รอการตอบรับ) ขอบคุณค่ะ สิ่งนี้จะช่วยคุณ..." },
-                { id: "P1Q3", part: 1, q: "ขอปรึกษาคนในครอบครัว/หัวหน้าก่อนนะ",  a: "เป็นเรื่องที่ดีเลยค่ะที่ปรึกษาผู้มีส่วนเกี่ยวข้อง ดิฉันขออนุญาตสรุปจุดเด่น 3 ข้อ เพื่อให้คุณนำไปนำเสนอได้ง่ายขึ้นนะคะ? มีอะไรที่ต้องชี้แจงเพิ่มเติมไหมคะ?" },
-                { id: "P1Q4", part: 1, q: "ไม่สนใจสินค้าประเภทนี้เลย",  a: "ดิฉันเข้าใจค่ะ แต่ผลิตภัณฑ์นี้ถูกออกแบบมาเพื่อช่วย **แก้ปัญหา A, B, C** ซึ่งหลายคนก็คิดว่าไม่สนใจ จนกระทั่งได้ลองฟัง... ขออนุญาตแนะนำสิ่งที่จะช่วยประหยัดเวลา/เงินให้คุณ 5 นาทีนะคะ?" },
-                { id: "P1Q5", part: 1, q: "ฉันเคยใช้บริการแบบนี้แล้ว ไม่เห็นผล",  a: "ขออภัยที่ประสบการณ์เดิมไม่ดีค่ะ ดิฉันเข้าใจความรู้สึกของคุณเลย แต่ของเรามีการปรับปรุงในส่วนของ **'กระบวนการทำงาน/วัตถุดิบ/เทคโนโลยี'** ทำให้มั่นใจว่าคุณจะเห็นผลที่แตกต่างแน่นอนค่ะ" },
-                { id: "P1Q6", part: 1, q: "ไม่มีงบประมาณสำหรับสิ่งนี้",  a: "ดิฉันเข้าใจเรื่องงบประมาณค่ะ แต่เมื่อเทียบกับ **ประโยชน์ (Value) หรือผลตอบแทน (ROI)** ที่คุณจะได้รับภายใน 3 เดือนข้างหน้าแล้ว จะพบว่านี่คือการลงทุนที่คุ้มค่าที่สุด เรามีทางเลือกให้ผ่อนชำระได้ด้วยนะคะ" },
-                { id: "P1Q7", part: 1, q: "ฉันซื้อจากเจ้าอื่นไปแล้ว",  a: "ยินดีด้วยค่ะ! ถือเป็นการตัดสินใจที่ดีเยี่ยมเลย ขออนุญาตสอบถามเผื่อเป็นทางเลือกสำรองได้ไหมคะ? ในกรณีที่คุณต้องการขยายหรือหา **ทางเลือกที่มีความยืดหยุ่นกว่า** ในอนาคต" },
-                { id: "P1Q8", part: 1, q: "ฉันไม่ว่างคุยนะ",  a: "ขออภัยที่รบกวนค่ะ เข้าใจว่าคุณลูกค้ามีงานสำคัญที่ต้องจัดการ ถ้าเช่นนั้น สะดวกให้ดิฉันโทรกลับกี่โมงดีคะ? หรือพรุ่งนี้ช่วงเช้าดีกว่าคะ?" },
-                { id: "P1Q9", part: 1, q: "ขอส่งข้อมูลทางอีเมลมาให้ดูก่อน",  a: "ดิฉันยินดีส่งข้อมูลให้ค่ะ แต่ขออนุญาตอธิบายสั้นๆ เพียง 2 นาที เพื่อให้คุณเห็นภาพรวมและ **เลือกไฟล์ที่เกี่ยวข้อง** กับความต้องการของคุณได้ถูก จะช่วยประหยัดเวลาคุณได้มากเลยค่ะ" },
-                { id: "P1Q10", part: 1, q: "ฉันไม่เชื่อว่าผลิตภัณฑ์คุณจะดีจริง",  a: "ดิฉันเข้าใจค่ะ การเชื่อในสิ่งที่ยังไม่เห็นเป็นเรื่องยาก แต่เรามี **การรับประกันคืนเงิน** ภายใน 30 วัน หรือผลลัพธ์จากลูกค้า (Testimonials) ที่มีปัญหาคล้ายคุณให้ดูค่ะ ขออนุญาตส่งข้อมูลการันตีให้ดูนะคะ" },
-                { id: "P1Q11", part: 1, q: "นานเกินไป เสียเวลา",  a: "ขออภัยค่ะ ดิฉันจะตัดเข้าประเด็นสำคัญที่เกี่ยวกับคุณลูกค้าทันทีเลยนะคะ (ลดความเร็วในการพูด) สิ่งที่เราจะเสนอนี้จะช่วยให้คุณ **ประหยัดเวลา/เงิน ได้ X%** นี่คือสิ่งที่คุณมองหาใช่ไหมคะ?" },
-                { id: "P1Q12", part: 1, q: "ไม่มีความจำเป็นต้องใช้",  a: "ถ้าเช่นนั้น ขออนุญาตแนะนำสิ่งที่อาจจะช่วยให้คุณ **ป้องกันปัญหา** ที่อาจเกิดขึ้นในอนาคต เช่น (ยกตัวอย่างปัญหา) เราไม่ได้ขายสิ่งที่จำเป็นวันนี้ แต่ขายสิ่งที่จำเป็นในวันหน้าค่ะ" },
-                { id: "P1Q13", part: 1, q: "ไม่ตอบคำถาม (เงียบไป)",  a: "คุณลูกค้ายังอยู่กับดิฉันไหมคะ? (รอ 5 วินาที) ขออนุญาตสรุปประเด็นที่เราคุยกันได้ไหมคะว่า **ข้อเสนอของเราช่วยคุณได้อย่างไร?**" },
-                { id: "P1Q14", part: 1, q: "ฉันจะติดต่อกลับไปเอง",  a: "ขอบคุณค่ะ เพื่อความรวดเร็ว ดิฉันขอชื่อและเบอร์ติดต่อที่สะดวกของคุณลูกค้าไว้ก่อนนะคะ และดิฉันจะส่งสรุปข้อมูลให้ทางอีเมล วันจันทร์หน้าเวลา 10 โมงสะดวกโทรกลับมาหาดิฉันไหมคะ?" },
-                { id: "P1Q15", part: 1, q: "ฉันไม่มีอำนาจตัดสินใจ",  a: "เข้าใจค่ะ ถ้าเช่นนั้น ท่านใดมีอำนาจตัดสินใจในเรื่องนี้คะ? หรือดิฉันสามารถขอเบอร์ติดต่อของท่านนั้น และส่งข้อมูลสรุปให้คุณลูกค้าช่วยนำเสนอต่อได้ไหมคะ?" },
-                { id: "P1Q16", part: 1, q: "ฉันใช้บริการฟรีอยู่แล้ว",  a: "แน่นอนค่ะ แต่บริการของเรามีฟีเจอร์/ข้อดีที่ต่างจากบริการฟรีตรงที่ **'ไม่มีข้อจำกัดด้าน... และมีบริการสนับสนุน 24 ชั่วโมง'** ซึ่งเป็นสิ่งที่บริการฟรีไม่มีค่ะ" },
-                { id: "P1Q17", part: 1, q: "ตลาดกำลังไม่ดี ไม่ควรลงทุนเพิ่ม",  a: "ดิฉันเห็นด้วยค่ะว่าตลาดอาจไม่ดี แต่การลงทุนในเครื่องมือ/บริการของเราตอนนี้ คือโอกาสที่ดีที่สุดในการ **สร้างความได้เปรียบ** เหนือคู่แข่งที่กำลังชะลอตัวลงค่ะ" },
-                { id: "P1Q18", part: 1, q: "ต้องใช้เวลานานในการติดตั้ง/เริ่มต้น",  a: "ผลิตภัณฑ์ของเราถูกออกแบบให้ติดตั้งง่ายและรวดเร็ว **ใช้เวลาเพียง 15 นาที** เท่านั้น และเรามีทีมงานที่พร้อมช่วยเหลือคุณตลอดกระบวนการ ไม่ต้องกังวลเรื่องนี้เลยค่ะ" },
-                { id: "P1Q19", part: 1, q: "ฉันไม่อยากให้ข้อมูลส่วนตัว",  a: "ดิฉันเข้าใจค่ะ เราใช้ข้อมูลเพื่อ **'ดำเนินการตามสัญญาและปรับปรุงบริการ'** เท่านั้น และเป็นไปตามนโยบายความเป็นส่วนตัวที่เข้มงวด คุณมั่นใจได้เลยว่าข้อมูลของคุณปลอดภัย 100% ค่ะ" },
-                { id: "P1Q20", part: 1, q: "โทรผิดเบอร์แล้ว",  a: "ขออภัยค่ะ เบอร์นี้เป็นเบอร์ของคุณ **'ชื่อลูกค้า'** ใช่ไหมคะ? ถ้าไม่ใช่ ดิฉันขออภัยอย่างสูงที่รบกวนเวลาอันมีค่าของคุณค่ะ" },
-                { id: "P1Q21", part: 1, q: "คุณพูดเร็วไป ฟังไม่ทัน",  a: "ขออภัยค่ะ ดิฉันจะพูดช้าลงนะคะ มีส่วนไหนที่ต้องการให้ทวนคะ? หรือคุณลูกค้าสนใจในประเด็น **'A' หรือ 'B'** มากกว่ากันคะ?" },
-                { id: "P1Q22", part: 1, q: "คุณเป็นใคร มาจากไหน?",  a: "ดิฉันชื่อ... จากบริษัท... ค่ะ เราติดต่อคุณเนื่องจากเราเห็นว่าคุณมีการใช้ **'บริการ X'** อยู่ และผลิตภัณฑ์ของเราสามารถช่วยคุณในเรื่อง **'Y'** ได้ค่ะ" },
-                { id: "P1Q23", part: 1, q: "ผลิตภัณฑ์ของคุณซับซ้อนเกินไป",  a: "ดิฉันเข้าใจค่ะ แม้ฟังก์ชันจะเยอะ แต่การใช้งานพื้นฐาน **ง่ายกว่าที่คุณคิดมาก** เรามีทีมสนับสนุนที่พร้อมช่วยเหลือในการตั้งค่าเริ่มต้น คุณแค่ใช้งานส่วนที่คุณต้องการเท่านั้นค่ะ" },
-                { id: "P1Q24", part: 1, q: "ฉันกำลังจะเปลี่ยนไปใช้บริการของคู่แข่ง",  a: "ขออนุญาตทราบเหตุผลได้ไหมคะ? บางทีเราอาจมี **ทางออกที่ดีกว่า** ในเรื่องนั้น หรือสามารถปรับปรุงบริการเพื่อรักษาคุณลูกค้าไว้ได้ค่ะ" },
-                { id: "P1Q25", part: 1, q: "ฉันไม่ได้รับอีเมลที่บอกว่าจะส่งมา",  a: "ขออภัยค่ะ รบกวนคุณลูกค้าเช็คใน **Junk Mail (เมลขยะ)** ได้ไหมคะ? หรือดิฉันขออีเมลสำรองเพื่อส่งซ้ำให้ทันทีเลยค่ะ" },
-                { id: "P1Q26", part: 1, q: "เราไม่มีปัญหาอะไรที่ต้องแก้ไข",  a: "เป็นเรื่องที่ดีค่ะ แต่เรามีวิธีที่จะช่วยให้คุณ **ดียิ่งขึ้นไปอีก 10%** ในเรื่อง 'ประสิทธิภาพ' หรือ 'การประหยัดต้นทุน' ซึ่งเป็นเรื่องที่คนไม่คิดว่าเป็นปัญหาจนกว่าจะลองใช้ค่ะ" },
-                { id: "P1Q27", part: 1, q: "ฉันต้องการรับประกันผลลัพธ์ 100%",  a: "ดิฉันไม่สามารถรับประกัน 100% ได้ค่ะ เพราะขึ้นอยู่กับการใช้งานของคุณลูกค้าด้วย แต่เรามี **สถิติที่แสดงว่า 95%** ของลูกค้าที่ทำตามขั้นตอนของเราประสบความสำเร็จ และเราพร้อมให้คำปรึกษาตลอดการใช้งานค่ะ" },
-                { id: "P1Q28", part: 1, q: "ฉันยังไม่เห็นความคุ้มค่า",  a: "เพื่อให้คุณเห็นภาพชัดเจน ขออนุญาตเทียบต้นทุน $X ต่อเดือน กับ **ผลตอบแทน** เช่น 'ประหยัดเวลา 10 ชั่วโมง/เดือน' หรือ 'เพิ่มยอดขาย $Y' ให้ดูนะคะ ถ้าทำได้ตามนี้ ถือว่าคุ้มค่าไหมคะ?" },
-                { id: "P1Q29", part: 1, q: "ต้องทำสัญญาผูกมัดนานแค่ไหน?",  a: "เรามีแพ็กเกจที่หลากหลายค่ะ ทั้งแบบ **รายเดือนที่ยืดหยุ่น** และแบบ **รายปีที่ประหยัด** กว่า ถ้าคุณลูกค้าลองใช้ 3 เดือนแล้วไม่พอใจ ก็สามารถยกเลิกได้ค่ะ" },
-                { id: "P1Q30", part: 1, q: "มีรีวิวจากลูกค้าคนอื่นไหม?",  a: "แน่นอนค่ะ เรามีรีวิวและ **กรณีศึกษา (Case Study)** จากลูกค้าในอุตสาหกรรมเดียวกับคุณลูกค้าเลยค่ะ ขออนุญาตส่งลิงก์วิดีโอ/บทสัมภาษณ์ให้ดูหลังจบสายได้ไหมคะ?" }
-            ],
-            part2: [
-                { id: "P2Q31", part: 2, q: "คู่แข่งของคุณทำได้ถูกกว่า",  a: "จริงค่ะ แต่เมื่อเทียบกับ **ฟีเจอร์ A, B, C** และ **บริการหลังการขาย** ของเราแล้ว ซึ่งคู่แข่งไม่มี ราคาของเราจึงเหมาะสมกับคุณภาพที่เหนือกว่า คุณภาพที่ยั่งยืนสำคัญกว่าราคาที่ถูกกว่าจริงไหมคะ?" },
-                { id: "P2Q32", part: 2, q: "ฉันต้องใช้เวลาศึกษาผลิตภัณฑ์นี้ก่อน",  a: "ดิฉันเข้าใจค่ะ ขออนุญาตส่งคู่มือสั้น ๆ **ฉบับสรุป 3 หน้า** ให้คุณอ่านได้ไหมคะ? และจะนัดคุยสั้น ๆ อีกครั้งในวันพุธเพื่อตอบคำถามที่คุณสงสัยโดยเฉพาะค่ะ" },
-                { id: "P2Q33", part: 2, q: "ฉันมีคู่ค้าอยู่แล้ว",  a: "ยินดีด้วยค่ะ! ถ้าเช่นนั้นคุณลูกค้าคงทราบดีว่าตลาดมีการเปลี่ยนแปลงตลอดเวลา การมี **ทางเลือกสำรอง (Backup Plan)** ที่ดีกว่าย่อมดีกว่าเสมอ เรามาดูข้อดีที่แตกต่างกันไหมคะ?" },
-                { id: "P2Q34", part: 2, q: "คุณพูดจาไม่น่าเชื่อถือเลย",  a: "ขออภัยหากดิฉันทำให้รู้สึกไม่ดีค่ะ ดิฉันจะปรับปรุงการสื่อสารให้ชัดเจนและเป็นทางการมากขึ้นนะคะ เพื่อให้คุณลูกค้าเกิดความมั่นใจในข้อมูลค่ะ" },
-                { id: "P2Q35", part: 2, q: "โทรศัพท์ของคุณสัญญาณไม่ดี",  a: "ขออภัยค่ะ (วางสายแล้วโทรกลับ/ย้ายตำแหน่ง) สัญญาณดีขึ้นแล้วใช่ไหมคะ? ดิฉันขอสรุปเรื่อง **'โปรโมชั่นพิเศษ'** ที่เราคุยค้างไว้เลยนะคะ" },
-                { id: "P2Q36", part: 2, q: "ฉันเกรงว่าคุณจะโทรมาบ่อยเกินไป",  a: "ดิฉันขอรับปากว่าจะไม่รบกวนบ่อยค่ะ เราจะติดต่อไปเฉพาะเวลาที่มี **ข้อมูลสำคัญหรือโปรโมชั่น** ที่เป็นประโยชน์ต่อคุณลูกค้าเท่านั้นค่ะ ขออนุญาตสรุปวันนี้ให้จบนะคะ" },
-                { id: "P2Q37", part: 2, q: "ฉันจะจัดการเองได้ ไม่ต้องใช้คุณ",  a: "คุณลูกค้าเก่งมากค่ะ! แต่ถ้ามี **เครื่องมือช่วยลดขั้นตอน** การทำงานที่ใช้เวลา 5 ชั่วโมงต่อสัปดาห์ ให้เหลือแค่ 10 นาที จะประหยัดเวลาและพลังงานไปทำอย่างอื่นได้มากขึ้นจริงไหมคะ?" },
-                { id: "P2Q38", part: 2, q: "ฉันต้องใช้เวลานานในการย้ายข้อมูล",  a: "เรามีทีมงานเฉพาะทางที่ช่วยจัดการเรื่องการย้ายข้อมูล **ให้ฟรี** และดูแลคุณตลอดกระบวนการค่ะ คุณลูกค้าแค่ให้ข้อมูลเริ่มต้น นอกนั้นเราจัดการให้ทั้งหมดเลยค่ะ" },
-                { id: "P2Q39", part: 2, q: "ฉันไม่เข้าใจว่ามันทำงานอย่างไร",  a: "ขออนุญาตอธิบายด้วยภาษาที่เข้าใจง่ายที่สุดนะคะ (ใช้ Analogies) ผลิตภัณฑ์ของเราทำงานเหมือน **'เครื่องมือ X ที่มีประโยชน์ในชีวิตประจำวัน'** โดยจะช่วยคุณ..." },
-                { id: "P2Q40", part: 2, q: "มีค่าธรรมเนียมแอบแฝงไหม?",  a: "ไม่มีค่าธรรมเนียมแอบแฝงค่ะ ทุกอย่างระบุในสัญญาและ **ใบเสนอราคาอย่างชัดเจน** เรายึดมั่นในความโปร่งใสค่ะ คุณลูกค้าสามารถอ่านรายละเอียดได้ทุกบรรทัดเลยนะคะ" },
-                { id: "P2Q41", part: 2, q: "ฉันกำลังจะลาออก/เปลี่ยนงาน",  a: "ยินดีด้วยค่ะ! ถ้าเช่นนั้น ใครจะมารับผิดชอบต่อจากคุณคะ? ดิฉันสามารถส่งข้อมูลทั้งหมดให้กับผู้รับผิดชอบใหม่ เพื่อให้งานของคุณดำเนินไปอย่างราบรื่นที่สุดได้ไหมคะ?" },
-                { id: "P2Q42", part: 2, q: "ฉันกำลังยุ่งอยู่กับโครงการอื่น",  a: "เข้าใจค่ะ งั้นเราจะเตรียมข้อมูลสำคัญที่สุดและสั้นที่สุดให้คุณพร้อม เมื่อคุณว่างแค่ 10 นาที ก็สามารถอ่านและตัดสินใจได้ทันที **โครงการนี้ช่วยประหยัดเวลา** ให้กับคุณในระยะยาวค่ะ" },
-                { id: "P2Q43", part: 2, q: "ฉันได้รับข้อเสนอที่ดีกว่า",  a: "ดีเลยค่ะ ข้อเสนอของเขาเป็นอย่างไรบ้างคะ? เพื่อให้เราได้เรียนรู้และ **ปรับปรุงข้อเสนอของเรา** ให้ดียิ่งขึ้นไปอีก เราพร้อมที่จะแข่งขันเพื่อให้คุณได้สิ่งที่ดีที่สุดค่ะ" },
-                { id: "P2Q44", part: 2, q: "ฉันต้องการทดลองใช้ฟรีก่อน",  a: "เรามีแพ็กเกจทดลองใช้แบบจำกัดฟีเจอร์ให้คุณ **ใช้ได้ 7 วัน** ค่ะ แต่ถ้าต้องการทดลองใช้ฟีเจอร์เต็มรูปแบบ ต้องเป็นการสมัครแบบรายเดือนไปก่อนค่ะ" },
-                { id: "P2Q45", part: 2, q: "ทำไมคุณถึงโทรหาฉัน?",  a: "เราเห็นว่าคุณมีการเข้าชมเว็บไซต์ของเราในส่วนของ **'ผลิตภัณฑ์ A'** ค่ะ จึงคิดว่าคุณกำลังมองหาทางแก้ไขปัญหาอยู่ และเรามีทางแก้ไขที่ตรงกับความต้องการของคุณค่ะ" },
-                { id: "P2Q46", part: 2, q: "ผลิตภัณฑ์ของคุณไม่เหมาะกับธุรกิจขนาดเล็ก/ใหญ่",  a: "ผลิตภัณฑ์ของเรายืดหยุ่นมากค่ะ สามารถ **ปรับขนาด (Scalable)** ให้เข้ากับธุรกิจตั้งแต่ขนาดเล็กไปจนถึงองค์กรขนาดใหญ่ได้ เพียงเลือกแพ็กเกจที่เหมาะสมกับจำนวนผู้ใช้เท่านั้นค่ะ" },
-                { id: "P2Q47", part: 2, q: "ฉันไม่มีเวลามาฝึกอบรม",  a: "ไม่ต้องกังวลค่ะ ผลิตภัณฑ์ใช้งานง่ายมาก และเรามี **วิดีโอสอนสั้น ๆ** ที่ใช้เวลาเรียนรู้รวมกันไม่เกิน 1 ชั่วโมง คุณสามารถเริ่มใช้งานได้ทันทีหลังติดตั้งเสร็จเลยค่ะ" },
-                { id: "P2Q48", part: 2, q: "คุณมีบริการหลังการขายดีแค่ไหน?",  a: "เรามีทีมสนับสนุนตลอด **24 ชั่วโมง/7 วัน** ผ่านช่องทางโทรศัพท์ อีเมล และ Chat Support ค่ะ ลูกค้าของเราทุกคนจะได้รับผู้จัดการบัญชี (Account Manager) ส่วนตัวด้วยค่ะ" },
-                { id: "P2Q49", part: 2, q: "ฉันไม่เคยได้ยินชื่อบริษัทคุณเลย",  a: "เข้าใจค่ะ เราเป็นบริษัทที่ก่อตั้งเมื่อ... และเชี่ยวชาญด้าน... ลูกค้าส่วนใหญ่ของเรามาจาก **การแนะนำแบบปากต่อปาก** ค่ะ นั่นเป็นเหตุผลที่ทำให้คุณอาจไม่คุ้นชื่อแต่คุณภาพดีแน่นอนค่ะ" },
-                { id: "P2Q50", part: 2, q: "ฉันไม่สามารถยกเลิกสัญญาได้ตอนนี้",  a: "ดิฉันเข้าใจค่ะ ถ้าเช่นนั้น เรามาดูว่าเราจะเริ่มเมื่อสัญญาเดิมของคุณลูกค้าหมดอายุลงได้ไหมคะ? เราสามารถ **จองโปรโมชั่น** นี้ไว้ให้คุณล่วงหน้าได้ค่ะ" },
-                { id: "P2Q51", part: 2, q: "สินค้าของคุณยังไม่สมบูรณ์แบบ",  a: "ขอบคุณสำหรับข้อเสนอแนะค่ะ เรากำลังพัฒนาเวอร์ชันถัดไปอย่างต่อเนื่อง แต่ฟังก์ชันปัจจุบัน **สามารถแก้ไขปัญหาหลัก 80%** ของคุณลูกค้าได้แล้ว เรามาเริ่มจากตรงนั้นก่อนดีไหมคะ?" },
-                { id: "P2Q52", part: 2, q: "ฉันเชื่อว่าราคาจะลดลงในภายหลัง",  a: "เป็นไปได้ค่ะ แต่ตอนนี้เป็นช่วงที่ดีที่สุด เพราะเรามี **โปรโมชั่นพิเศษ X%** ที่ไม่เคยมีมาก่อน และโปรโมชั่นนี้จะหมดอายุภายใน 48 ชั่วโมงค่ะ" },
-                { id: "P2Q53", part: 2, q: "คู่แข่งของฉันใช้ผลิตภัณฑ์ของคุณอยู่",  a: "นั่นแสดงว่าผลิตภัณฑ์ของเราได้ผลจริงค่ะ! ลองนึกภาพว่าถ้าคู่แข่งของคุณสามารถทำได้ดีกว่านี้เมื่อมีผลิตภัณฑ์ของเรา คุณก็ควรมี **เครื่องมือที่ดีที่สุด** เพื่อแข่งขันเช่นกันจริงไหมคะ?" },
-                { id: "P2Q54", part: 2, q: "ฉันชอบความเรียบง่าย ไม่ชอบความซับซ้อน",  a: "ผลิตภัณฑ์เราเรียบง่ายมากค่ะ ฟีเจอร์ที่ซับซ้อนเราจัดการให้หมดในส่วนของ Back-end ส่วนหน้าจอที่คุณใช้ **ถูกออกแบบให้ Minimal** และใช้งานง่ายที่สุดค่ะ" },
-                { id: "P2Q55", part: 2, q: "ฉันไม่ไว้ใจการซื้อขายออนไลน์",  a: "เราเข้าใจค่ะ คุณสามารถมาทำสัญญาและชำระเงิน **ที่สำนักงานของเราได้นะคะ** หรือจะใช้วิธีเก็บเงินปลายทางในการจัดส่งสินค้าก็ได้ค่ะ" },
-                { id: "P2Q56", part: 2, q: "ฉันอยากให้คุณลดราคากว่านี้อีกนิด",  a: "ราคาที่เสนอนี้คือราคาที่ดีที่สุดแล้วค่ะ แต่ดิฉันสามารถเพิ่ม **สิทธิพิเศษ** เช่น 'การฝึกอบรมฟรี' หรือ 'การเข้าถึงฟีเจอร์ Pro 1 เดือน' ให้แทนได้ค่ะ" },
-                { id: "P2Q57", part: 2, q: "ฉันต้องการหลักฐานทางวิทยาศาสตร์",  a: "เรามีการศึกษาและงานวิจัยรองรับค่ะ โดยเฉพาะเรื่อง **ประสิทธิภาพในการลด/เพิ่ม...** ขออนุญาตส่งข้อมูลทางเทคนิคที่ผ่านการตรวจสอบจาก (สถาบันที่เชื่อถือได้) ให้คุณลูกค้าตรวจสอบได้ไหมคะ?" },
-                { id: "P2Q58", part: 2, q: "ฉันไม่เคยมีปัญหาแบบที่คุณกล่าวมา",  a: "ดีใจด้วยค่ะ แต่อย่าลืมว่า **การป้องกันย่อมดีกว่าการแก้ไข** เสมอ หากมีปัญหานั้นเกิดขึ้นมา คุณลูกค้าจะมีเครื่องมือที่พร้อมรับมือทันที จะได้ไม่ต้องเสียเวลาแก้ไขทีหลังค่ะ" },
-                { id: "P2Q59", part: 2, q: "ฉันต้องการให้คุณเสนอสิ่งที่ไม่เหมือนใคร",  a: "จุดเด่นของเราคือ **'เทคโนโลยี AI ที่ปรับให้เข้ากับพฤติกรรมลูกค้าของคุณโดยเฉพาะ'** ซึ่งไม่มีในคู่แข่งรายอื่น ๆ ค่ะ สิ่งนี้คือความแตกต่างและไม่เหมือนใครที่เรามอบให้ค่ะ" },
-                { id: "P2Q60", part: 2, q: "ฉันต้องการให้คุณโทรหาผู้จัดการของฉันแทน",  a: "ดิฉันยินดีค่ะ รบกวนขอชื่อและเบอร์โทรศัพท์ของผู้จัดการหน่อยนะคะ เพื่อให้ดิฉันแจ้งรายละเอียด **การเสนอราคาสุดพิเศษ** นี้ให้ท่านทราบโดยเร็วที่สุดค่ะ" }
-            ],
-            part3: [
-                { id: "P3Q61", part: 3, q: "ฉันไม่ต้องการพูดกับพนักงานขาย",  a: "ดิฉันเข้าใจค่ะ แต่ดิฉันไม่ได้แค่ขาย ดิฉันมาเพื่อหา **ทางออกที่ดีที่สุด** ให้กับปัญหาที่คุณกำลังเผชิญอยู่ ขออนุญาตถามคำถามสั้นๆ 2 ข้อ เพื่อประเมินความต้องการของคุณลูกค้าได้ไหมคะ?" },
-                { id: "P3Q62", part: 3, q: "ฉันสามารถหาผลิตภัณฑ์ที่คล้ายกันได้ในราคาถูกกว่า",  a: "อาจจะจริงค่ะ แต่ถ้าเทียบฟังก์ชันการทำงานแบบ **ต่อแบบ** จะพบว่าผลิตภัณฑ์ที่ถูกกว่านั้น **ขาดฟีเจอร์สำคัญ A, B** ไปค่ะ ซึ่งฟีเจอร์นี้เองที่จะช่วยให้คุณประหยัดเงินในระยะยาว" },
-                { id: "P3Q63", part: 3, q: "เราไม่มีความจำเป็นต้องเปลี่ยนซัพพลายเออร์ตอนนี้",  a: "ดิฉันเข้าใจความภักดีค่ะ แต่การมีทางเลือกที่ดีกว่าย่อมดีกว่าเสมอ เราไม่ได้ต้องการให้คุณเปลี่ยนทันที แต่ลองเปรียบเทียบดูว่า **มีจุดไหนที่เราเหนือกว่า** ที่จะช่วยคุณในเรื่อง 'ความน่าเชื่อถือ' ได้ดีกว่าไหมคะ?" },
-                { id: "P3Q64", part: 3, q: "ฉันไม่มีบัตรเครดิต/วิธีการชำระเงินไม่สะดวก",  a: "เรามีทางเลือกในการชำระเงินอื่น ๆ เช่น **โอนเงินผ่านบัญชีธนาคาร** หรือ **QR Code** ค่ะ เรายินดีอำนวยความสะดวกในช่องทางที่คุณลูกค้าสะดวกที่สุดเลยค่ะ" },
-                { id: "P3Q65", part: 3, q: "ฉันต้องการดูตัวอย่างสินค้าจริงก่อน",  a: "เรามีวิดีโอ **สาธิตการใช้งาน (Demo)** ออนไลน์ให้ชมค่ะ หรือสามารถนัดหมายให้ทีมงานเข้าไปสาธิตแบบตัวต่อตัวได้ในวันพุธหน้า สะดวกไหมคะ?" },
-                { id: "P3Q66", part: 3, q: "ขอคุยเฉพาะเรื่องธุรกิจ ไม่คุยเรื่องส่วนตัว",  a: "ขออภัยค่ะ ดิฉันจะเข้าเรื่องทันทีนะคะ และจะไม่รบกวนเวลาของคุณลูกค้าอีกค่ะ เพื่อเป็นการตอบแทน ดิฉันขออนุญาตให้ **ส่วนลดพิเศษ 5%** สำหรับการสั่งซื้อวันนี้เลยค่ะ" },
-                { id: "P3Q67", part: 3, q: "ฉันกังวลเรื่องความปลอดภัยของข้อมูล",  a: "ระบบของเราเข้ารหัสข้อมูลระดับสูงสุดด้วย **มาตรฐาน ISO 27001** ค่ะ และเราไม่เคยมีประวัติข้อมูลรั่วไหลเลย คุณมั่นใจได้เลยว่าข้อมูลของคุณปลอดภัยเทียบเท่าธนาคารค่ะ" },
-                { id: "P3Q68", part: 3, q: "บริษัทของคุณจะล้มละลายไหม?",  a: "เราเป็นบริษัทที่มีความมั่นคงทางการเงินสูง/ได้รับทุนจาก **(ชื่อนักลงทุน/สถาบันการเงิน)** และมีแผนธุรกิจในระยะยาวถึง 5 ปีค่ะ เราจะอยู่เคียงข้างคุณไปอีกนานแน่นอนค่ะ" },
-                { id: "P3Q69", part: 3, q: "ฉันขอเอกสารสรุปเป็นภาษาไทย",  a: "แน่นอนค่ะ เอกสารทั้งหมดของเราเป็น **ภาษาไทยที่สมบูรณ์** และได้รับการแปลอย่างถูกต้องตามกฎหมายค่ะ ดิฉันจะส่งให้ทางอีเมลภายใน 5 นาทีหลังจบสายค่ะ" },
-                { id: "P3Q70", part: 3, q: "ฉันไม่สามารถตัดสินใจภายในวันนี้",  a: "ดิฉันเข้าใจค่ะ แต่ข้อเสนอนี้เป็นราคาพิเศษสำหรับ **ลูกค้า 100 ท่านแรก** เท่านั้น ซึ่งจะหมดอายุภายในวันนี้ ถ้าคุณลูกค้าสนใจจริงๆ ดิฉันขออนุญาตจองสิทธิ์นี้ไว้ให้ได้ไหมคะ?" },
-                { id: "P3Q71", part: 3, q: "มีค่าใช้จ่ายเพิ่มเติมในการอัพเกรดไหม?",  a: "จะมีค่าใช้จ่ายเพิ่มขึ้นตาม **แพ็กเกจ** ที่คุณลูกค้าเลือกค่ะ แต่คุณจะได้รับฟีเจอร์เพิ่มขึ้น X, Y, Z ค่ะ ซึ่งจะระบุในตารางราคาอย่างชัดเจน ไม่มีการเรียกเก็บย้อนหลังค่ะ" },
-                { id: "P3Q72", part: 3, q: "ฉันจะติดต่อคุณได้อย่างไร หากมีปัญหา?",  a: "คุณสามารถติดต่อดิฉันโดยตรงที่เบอร์นี้ได้ตลอดเวลาทำการค่ะ หรือฝ่ายสนับสนุนของเราพร้อมให้บริการ **24/7** ผ่านช่องทางโทรศัพท์ อีเมล และ Chat Support ค่ะ" },
-                { id: "P3Q73", part: 3, q: "ผลิตภัณฑ์ของคุณเข้ากับระบบปัจจุบันของฉันได้ไหม?",  a: "แน่นอนค่ะ ผลิตภัณฑ์ของเราออกแบบให้ใช้งานร่วมกับ **'โปรแกรม/ระบบปฏิบัติการ'** ที่คุณลูกค้าใช้อยู่ได้อย่างไม่มีปัญหา และมี API สำหรับการเชื่อมต่อพิเศษด้วยค่ะ" },
-                { id: "P3Q74", part: 3, q: "ฉันไม่ชอบวิธีการขายแบบนี้เลย",  a: "ขออภัยค่ะ ดิฉันจะปรับวิธีการนำเสนอให้เป็นไปตามที่คุณลูกค้าต้องการ **คุณลูกค้าสะดวกให้ดิฉันพูดถึง 'ประโยชน์' หรือ 'ราคา' ก่อนดีคะ?**" },
-                { id: "P3Q75", part: 3, q: "ฉันต้องการคุยกับเจ้าของบริษัท",  a: "ตอนนี้เจ้าของไม่สะดวกให้ติดต่อโดยตรงค่ะ มีเรื่องด่วนที่ดิฉันสามารถช่วยเหลือและ **ตัดสินใจแทน** ได้ไหมคะ? หากจำเป็นจริงๆ ดิฉันจะขอให้ผู้จัดการติดต่อไปค่ะ" },
-                { id: "P3Q76", part: 3, q: "คุณแน่ใจได้อย่างไรว่ามันจะช่วยฉันได้จริง?",  a: "เรามีสถิติที่ชัดเจนจากลูกค้าที่ **คล้ายกับคุณลูกค้า (Case Study)** ค่ะ โดยเฉพาะเรื่อง **'ปัญหา X'** เราสามารถลดต้นทุนได้ถึง 20% ค่ะ คุณลูกค้าอยากให้ดิฉันส่งรายงานนี้ให้ดูไหมคะ?" },
-                { id: "P3Q77", part: 3, q: "ฉันต้องการให้คุณเสนอสิ่งที่ดีกว่านี้",  a: "ขอทราบว่าสิ่งที่คุณต้องการเพิ่มเติมคืออะไรคะ? **(ฟังอย่างตั้งใจ)** เราอาจจะมีแพ็กเกจพรีเมียมที่ตอบโจทย์ของคุณได้มากกว่า หรือสามารถปรับแต่งบางฟีเจอร์ให้คุณโดยเฉพาะค่ะ" },
-                { id: "P3Q78", part: 3, q: "ฉันจะรู้ได้อย่างไรว่าคุณจะไม่ทิ้งฉัน?",  a: "เราให้ความสำคัญกับลูกค้าหลังการขายมากค่ะ เรามีทีมงานที่ดูแลคุณโดยเฉพาะตลอดระยะสัญญา **คุณสามารถติดต่อผู้จัดการบัญชีของคุณได้โดยตรง** เพื่อความสบายใจค่ะ" },
-                { id: "P3Q79", part: 3, q: "มีข้อจำกัดในการใช้งานอะไรบ้าง?",  a: "มีข้อจำกัดด้าน **'จำนวนผู้ใช้ 10 คน'** ค่ะ แต่เราได้ระบุไว้อย่างชัดเจนในคู่มือการใช้งานแล้ว หากเกินกว่านั้นก็สามารถอัปเกรดได้เลยค่ะ" },
-                { id: "P3Q80", part: 3, q: "ฉันไม่ต้องการให้คุณโทรมาอีก",  a: "ดิฉันรับทราบค่ะ และจะนำเบอร์ของคุณลูกค้าออกจากระบบการติดต่อทันทีค่ะ ขออภัยที่รบกวนนะคะ และหวังว่าจะมีโอกาสได้บริการคุณลูกค้าในอนาคตค่ะ (ปิดการขายอย่างสุภาพ)" },
-                { id: "P3Q81", part: 3, q: "บริการของคุณใช้ได้แค่บางพื้นที่ใช่ไหม?",  a: "บริการของเราเป็น **ระบบออนไลน์** ค่ะ สามารถใช้งานได้ทุกพื้นที่ทั่วโลก ตราบใดที่มีอินเทอร์เน็ตค่ะ ไม่ได้จำกัดแค่บางพื้นที่นะคะ" },
-                { id: "P3Q82", part: 3, q: "ฉันไม่ต้องการให้มีโฆษณาแทรก",  a: "แพ็กเกจของเราเป็นแบบพรีเมียม ไม่มีโฆษณาแทรกอย่างแน่นอนค่ะ คุณจะได้รับประสบการณ์เต็มรูปแบบที่ลื่นไหลและมีประสิทธิภาพสูงสุดค่ะ" },
-                { id: "P3Q83", part: 3, q: "คุณมีใบอนุญาต/มาตรฐานรับรองไหม?",  a: "แน่นอนค่ะ เราได้รับการรับรอง **มาตรฐานด้านความปลอดภัย** และ **คุณภาพจาก (สถาบัน/หน่วยงาน)** ค่ะ และเราจะส่งเอกสารการรับรองให้คุณลูกค้าดูได้ค่ะ" },
-                { id: "P3Q84", part: 3, q: "ฉันกลัวว่าไฟล์เสียงจะใช้พื้นที่เยอะ",  a: "ไฟล์เสียงของเราถูกบีบอัดให้มีขนาดเล็ก แต่คุณภาพสูงเพื่อประหยัดพื้นที่ค่ะ โดยทั่วไป **1 ชั่วโมงจะใช้พื้นที่เพียง 10MB** เท่านั้นค่ะ" },
-                { id: "P3Q85", part: 3, q: "คุณให้ส่วนลดพิเศษในวันเกิดไหม?",  a: "เรามีโปรโมชั่นพิเศษสำหรับลูกค้าปัจจุบันและ **โปรแกรมสะสมคะแนน** ที่สามารถแลกเป็นส่วนลดในโอกาสพิเศษได้ค่ะ แต่ข้อเสนอที่เราให้วันนี้ดีกว่าค่ะ" },
-                { id: "P3Q86", part: 3, q: "ฉันไม่มีเวลาอ่านอีเมลที่คุณส่งมา",  a: "ไม่เป็นไรค่ะ ดิฉันขอสรุปสั้น ๆ ทางโทรศัพท์เลยนะคะ (เน้นย้ำแค่ 3 ประเด็นสำคัญ) **1. ประหยัดเงิน 2. ประหยัดเวลา 3. ได้รับบริการหลังการขาย 24 ชั่วโมง** ค่ะ" },
-                { id: "P3Q87", part: 3, q: "ผลิตภัณฑ์ของคุณมีการอัปเดตบ่อยไหม?",  a: "เรามีการอัปเดตฟีเจอร์ใหม่และแก้ไขข้อบกพร่องสม่ำเสมอ **ทุก ๆ 2 เดือน** ค่ะ โดยคุณลูกค้าจะได้รับการอัปเดตฟรีตลอดระยะสัญญาค่ะ" },
-                { id: "P3Q88", part: 3, q: "ฉันอยากได้แบบสีอื่น/รูปแบบอื่น",  a: "เรามีตัวเลือกให้เลือก **5 สี** และ **3 รูปแบบ** ค่ะ รบกวนระบุสีหรือรูปแบบที่คุณลูกค้าต้องการหน่อยนะคะ ดิฉันจะส่งแคตตาล็อกให้ดูเพิ่มเติมค่ะ" },
-                { id: "P3Q89", part: 3, q: "มันดูเหมือนหลอกลวง",  a: "ดิฉันเข้าใจที่คิดแบบนั้นค่ะ แต่เรามีหลักฐานและบริษัทที่ **น่าเชื่อถือ (ระบุชื่อบริษัท/หน่วยงานที่รับรอง)** คุณลูกค้าสามารถตรวจสอบประวัติการจดทะเบียนได้เลยค่ะ เราโปร่งใสและพร้อมพิสูจน์ค่ะ" },
-                { id: "P3Q90", part: 3, q: "คุณทำอะไรกับข้อมูลส่วนตัวของฉัน?",  a: "ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เพื่อ **'ปรับปรุงบริการและส่งมอบข้อมูลที่คุณสนใจ'** เท่านั้น เราปฏิบัติตามกฎหมาย PDPA อย่างเคร่งครัดค่ะ" }
-            ]
+            // Part 1: การแก้คำปฏิเสธต้นสาย (30 ข้อ)
+    part1: [
+        { id: "P1Q1", part: 1, q: "ไม่สนใจครับ/ค่ะ ต้องขอโทษด้วย ขอวางสายเลยนะครับ/คะ", a: "เข้าใจเลยค่ะ/ครับ ว่าอาจจะยังไม่สนใจในตอนนี้ แต่ที่โทรมาหาคุณลูกค้าวันนี้เป็นโครงการพิเศษที่ **ไม่ได้เป็นการขายตรง** ค่ะ/ครับ เป็นเพียงการ **มอบสิทธิประโยชน์** ที่ใช้เวลาอธิบายแค่ 1 นาทีเท่านั้น ถ้าไม่ตรงใจ คุณลูกค้าสามารถวางสายได้เลยค่ะ/ครับ" },
+        { id: "P1Q2", part: 1, q: "ขอโทษนะคะ/ครับ มีประกันที่ครอบคลุมทุกอย่างที่ต้องการแล้วค่ะ/ครับ", a: "เยี่ยมเลยค่ะ/ครับ แสดงว่าเป็นคนที่วางแผนชีวิตได้ดีมาก ถ้าอย่างนั้นขออนุญาตสอบถามสั้นๆ ค่ะ/ครับ *แผนที่คุณลูกค้ามีอยู่มีเรื่องของ **ค่าห้องสูงสุด** ถึง [ระบุตัวเลขสูง] หรือยังคะ/ครับ?* เพราะโครงการใหม่นี้ **เน้นเฉพาะจุดที่แผนเดิมอาจจะยังไม่ครอบคลุม** ค่ะ/ครับ" },
+        { id: "P1Q3", part: 1, q: "ขอบคุณที่โทรมาเสนอค่ะ/ครับ แต่ตอนนี้ไม่สะดวกพิจารณาเรื่องประกันเพิ่มค่ะ/ครับ", a: "เข้าใจค่ะ/ครับ แต่โครงการนี้ **ไม่ได้บังคับให้พิจารณาตอนนี้** ค่ะ/ครับ เพียงแต่ **สิทธิ์ในการจอง** แผนเบี้ยพิเศษนี้จะหมดเขตเร็วๆ นี้ ขออนุญาตให้ข้อมูลหลักการเพื่อให้คุณลูกค้า **มีทางเลือกสำรอง** ไว้ก่อนตัดสินใจค่ะ/ครับ" },
+        { id: "P1Q4", part: 1, q: "รบกวนช่วยนำเบอร์นี้ออกจากรายชื่อผู้ติดต่อได้ไหมครับ/คะ ไม่สนใจจริงๆ", a: "ยินดีค่ะ/ครับ ก่อนจะนำออกขออนุญาตใช้เวลา 15 วินาที เพื่อให้คุณลูกค้าได้ **ปฏิเสธด้วยข้อมูลที่ครบถ้วน** นะคะ/ครับ หากปฏิเสธแล้ว ดิฉัน/ผมจะดำเนินการนำชื่อออกให้ **ถาวร** ค่ะ/ครับ" },
+        { id: "P1Q5", part: 1, q: "ช่วงนี้การเงินตึงตัวมากค่ะ/ครับ ขอโทษด้วยนะคะ/ครับ", a: "เข้าใจเลยค่ะ/ครับ เศรษฐกิจแบบนี้ทุกคนต้องระมัดระวัง นั่นเป็นเหตุผลที่เราอยากแนะนำแผนนี้เลยค่ะ/ครับ เพราะเรามีแผนที่ **เริ่มต้นที่ [ระบุเบี้ยต่อวัน เช่น 15 บาท/วัน]** เท่านั้น เพื่อให้มั่นใจว่าเงินเก็บไม่หายไปกับเรื่องไม่คาดฝันค่ะ/ครับ" },
+        { id: "P1Q6", part: 1, q: "ขอโทษครับ/ค่ะ ตอนนี้กำลังขับรถ/ติดประชุม/ทำงานอยู่ ไม่สะดวกรับสายเรื่องส่วนตัวครับ/ค่ะ", a: "ต้องขออภัยจริงๆ ค่ะ/ครับ ที่รบกวนเวลาสำคัญ ถ้าอย่างนั้นขออนุญาต **นัดหมายเวลาที่สะดวก** ในวันนี้ หรือพรุ่งนี้เลยได้ไหมคะ/ครับ? เป็น **เย็นนี้ [ระบุเวลา]** หรือ **พรุ่งนี้เช้า [ระบุเวลา]** ดีคะ/ครับ?" },
+        { id: "P1Q7", part: 1, q: "มีคนดูแลเรื่องการเงินและการทำประกันให้เรียบร้อยแล้วค่ะ/ครับ", a: "ดีมากค่ะ/ครับ การมีที่ปรึกษาเป็นเรื่องที่ควรทำ ถ้าอย่างนั้น ขออนุญาตฝากข้อมูล **'สิทธิพิเศษที่ไม่สามารถหาได้จากที่ปรึกษาทั่วไป'** นี้ไว้ให้คุณลูกค้าส่งต่อให้พิจารณาได้ไหมคะ/ครับ?" },
+        { id: "P1Q8", part: 1, q: "ไม่รับโทรศัพท์ที่ติดต่อมาขายสินค้าหรือบริการครับ/ค่ะ ขออนุญาตวางสายนะครับ/คะ", a: "เข้าใจค่ะ/ครับ และขอโทษที่รบกวนเวลา แต่ถ้าอย่างนั้นขออนุญาตให้ข้อมูลสั้นๆ แค่ 30 วินาทีในฐานะ **ที่ปรึกษา** นะคะ/ครับ เพื่อให้คุณลูกค้าทราบว่ามีสิทธิพิเศษนี้อยู่ ถ้าไม่ตรงใจเราจะไม่ติดต่อกลับไปอีกค่ะ/ครับ" },
+        { id: "P1Q9", part: 1, q: "ไม่ใช่นโยบายส่วนตัวที่จะซื้อประกันผ่านทางโทรศัพท์ครับ/ค่ะ", a: "ขอบคุณที่แจ้งนโยบายส่วนตัวค่ะ/ครับ ดิฉัน/ผมไม่ได้ขอให้คุณลูกค้าซื้อผ่านโทรศัพท์ค่ะ/ครับ เพียงแต่ **ใช้โทรศัพท์ในการแจ้งข้อมูล** และ **ยืนยันสิทธิ์** เท่านั้น การอนุมัติทั้งหมดจะถูกส่งไปให้คุณลูกค้า **พิจารณาอย่างละเอียด** ที่บ้านก่อนค่ะ/ครับ" },
+        { id: "P1Q10", part: 1, q: "ผม/ดิฉันติดบัญชีดำเรื่องการเงินอยู่ครับ/ค่ะ คงทำไม่ได้", a: "เข้าใจถึงสถานการณ์ค่ะ/ครับ แต่โครงการของเรา **ไม่ได้มีการตรวจสอบเครดิตบูโร** ค่ะ/ครับ หากคุณลูกค้ามีอายุและสุขภาพอยู่ในเกณฑ์ก็สามารถทำได้เลยค่ะ/ครับ ขออนุญาตสอบถามเพียง 2 คำถามเกี่ยวกับอายุและสุขภาพได้ไหมคะ/ครับ?" },
+        { id: "P1Q11", part: 1, q: "ขอโทษครับ/ค่ะ มีข้อจำกัดด้านสุขภาพ/อายุ ที่ไม่สามารถทำประกันเพิ่มได้แล้วค่ะ/ครับ", a: "เข้าใจเลยค่ะ/ครับ ทางเราก็มีโครงการที่ออกแบบมาเพื่อ **ผู้สูงวัย** หรือ **ผู้ที่มีประวัติสุขภาพ** โดยเฉพาะค่ะ/ครับ เช่น แผนที่ **ไม่ต้องตรวจสุขภาพ** ขออนุญาตสอบถามอายุและประวัติโดยย่อเพื่อดูว่าคุณลูกค้าเข้าเกณฑ์ไหมคะ/ครับ?" },
+        { id: "P1Q12", part: 1, q: "รบกวนวางสายเลยนะคะ/ครับ ขอบคุณค่ะ/ครับ", a: "ได้ค่ะ/ครับ แต่ก่อนวางสาย ขออนุญาตยืนยันกับคุณลูกค้าหน่อยนะคะ/ครับว่าคุณลูกค้า **ได้ทราบข้อมูลสิทธิพิเศษ** ที่ช่วยให้คุณลูกค้า [ระบุประโยชน์หลัก] แล้วจริงๆ ถ้าทราบแล้ว ดิฉัน/ผมจะไม่รบกวนแล้วค่ะ/ครับ" },
+        { id: "P1Q13", part: 1, q: "ไม่ว่างเลยครับ/ค่ะ พูดได้คำเดียวว่า *ไม่สนใจ* นะครับ/คะ", a: "เข้าใจว่าไม่สนใจค่ะ/ครับ เพียงแต่โครงการนี้เปิดให้สิทธิ์เฉพาะลูกค้าคนพิเศษตามข้อมูลที่เราได้รับมาเท่านั้นค่ะ/ครับ ขอเวลาสั้นๆ แค่ 20 วินาที เพื่อให้คุณลูกค้า **ไม่พลาดสิทธิ์** ที่ควรได้รับนะคะ/ครับ" },
+        { id: "P1Q14", part: 1, q: "เงินเก็บไม่พอทำประกันครับ/ค่ะ", a: "เข้าใจค่ะ/ครับ ดิฉัน/ผมไม่ได้แนะนำให้คุณลูกค้าใช้เงินเก็บค่ะ/ครับ แต่แนะนำให้ **กันเงินส่วนเล็กน้อย** จากรายได้ประจำ เพื่อเปลี่ยนเป็นความมั่นคงที่สูงถึงหลักล้านค่ะ/ครับ (เช่น เงินค่ากาแฟต่อวัน) คุณลูกค้าคิดว่าถ้าเป็นจำนวนนี้พอจะแบ่งมาได้ไหมคะ/ครับ?" },
+        { id: "P1Q15", part: 1, q: "รบกวนโทรกลับมาใหม่...วันมะรืนตอนตี 3 นะคะ/ครับ", a: "ขอบคุณที่ให้โอกาสค่ะ/ครับ แต่เกรงว่า **ระบบจะไม่สามารถโทรออกในช่วงเวลานั้นได้** ค่ะ/ครับ ถ้าอย่างนั้นขออนุญาตหาเวลาที่สะดวกที่สุด **ภายในพรุ่งนี้** ได้ไหมคะ/ครับ? เพราะ **โครงการนี้มีจำกัด** ค่ะ/ครับ" },
+        { id: "P1Q16", part: 1, q: "ไม่เป็นไรค่ะ/ครับ ไม่ต้องอธิบายให้ฟัง เสียเวลาทั้งคู่", a: "ขอบคุณที่ตรงไปตรงมาค่ะ/ครับ นั่นหมายความว่าคุณลูกค้าอาจจะยังไม่ทราบ **ความแตกต่าง** ของโครงการที่เรากำลังนำเสนอ ที่ถูกออกแบบมาให้ **คุ้มค่ากว่า/เบี้ยถูกกว่า** แผนเดิมค่ะ/ครับ ขอเวลาเพียง 1 นาทีเพื่อเปรียบเทียบข้อดีนะคะ/ครับ" },
+        { id: "P1Q17", part: 1, q: "มีกรมธรรม์ที่ซื้อไว้กับบริษัทคุณ/บริษัทอื่น เพียงพอต่อความต้องการแล้วค่ะ/ครับ", a: "เราทราบว่าคุณลูกค้ามีกรมธรรม์อยู่แล้ว แต่โครงการที่เรานำเสนอนี้เป็น **'กรมธรรม์ฉบับที่ 2'** ที่เน้นเรื่อง [ระบุ: เบี้ยถูกลง/วงเงินสูงขึ้น] **โดยเฉพาะ** ค่ะ/ครับ เพื่อให้คุณลูกค้า **ไม่ต้องปรับแผนเดิม** ที่มีอยู่เลย" },
+        { id: "P1Q18", part: 1, q: "ขอโทษนะคะ/ครับ ไม่ได้รับสายเรื่องส่วนตัวในเวลางานค่ะ/ครับ", a: "เข้าใจค่ะ/ครับ ถ้าอย่างนั้นนอกเวลางานที่สะดวกที่สุดคือช่วงไหนดีคะ/ครับ ดิฉัน/ผมจะโทรกลับไป **ตามเวลานัดหมาย** เพื่อให้คุณลูกค้ามั่นใจว่าเราให้ความสำคัญกับเวลาส่วนตัวของคุณลูกค้าค่ะ/ครับ" },
+        { id: "P1Q19", part: 1, q: "ผม/ดิฉันได้แจ้งไปหลายครั้งแล้วว่าไม่สนใจ รบกวนเคารพการตัดสินใจด้วยนะครับ/คะ", a: "ต้องขออภัยแทนเพื่อนร่วมงานที่รบกวนซ้ำซ้อนด้วยนะคะ/ครับ แต่ที่ดิฉัน/ผมโทรมาครั้งนี้ เพราะมีข้อมูล *อัพเดตสิทธิพิเศษ* ที่เป็น **ข้อเสนอสุดท้าย** ก่อนปิดโครงการจริงๆ ค่ะ/ครับ ขออนุญาตใช้โอกาสนี้ให้ข้อมูลครั้งเดียวและเป็นครั้งสุดท้ายนะคะ/ครับ" },
+        { id: "P1Q20", part: 1, q: "ไม่มีเงินครับ/ค่ะ", a: "เข้าใจเลยค่ะ/ครับ ถ้าอย่างนั้นยิ่งต้องมีแผนนี้เลยค่ะ/ครับ เพราะ **คนที่ 'ไม่มีเงิน' ยิ่งมีความเสี่ยงสูง** หากเกิดเหตุไม่คาดฝัน แผนของเราจะช่วย **ปกป้องเงินเก็บที่มีอยู่** ไม่ให้ต้องนำมาใช้กับเรื่องฉุกเฉินค่ะ/ครับ" },
+        { id: "P1Q21", part: 1, q: "กำลังทานข้าว/เข้าห้องน้ำอยู่ค่ะ/ครับ", a: "ขอโทษที่รบกวนช่วงเวลาพักผ่อนค่ะ/ครับ ขออนุญาตโทรกลับไปอีกครั้งหลังคุณลูกค้าทานข้าวเสร็จ หรืออีก **15 นาที** ได้ไหมคะ/ครับ? จะได้ไม่รบกวนสมาธิค่ะ/ครับ" },
+        { id: "P1Q22", part: 1, q: "เราไม่สะดวกรับฟังการขายของผ่านโทรศัพท์จริงๆ ค่ะ/ครับ", a: "เข้าใจค่ะ/ครับ และเราก็ไม่ได้มีนโยบายขายของแบบยัดเยียด แต่ดิฉัน/ผมได้รับมอบหมายให้ **แจ้งสิทธิ์สำคัญ** ที่บริษัทมอบให้ค่ะ/ครับ ขอเวลาเพียง **1 นาที** เพื่อแจ้งสิทธิ์นี้โดยย่อ หากไม่ถูกใจจะได้ลบชื่อคุณลูกค้าออกจากระบบทันทีค่ะ/ครับ" },
+        { id: "P1Q23", part: 1, q: "ตอนนี้งดรับภาระผูกพันระยะยาวทุกชนิดครับ/ค่ะ", a: "เข้าใจและเห็นด้วยค่ะ/ครับ ดังนั้น ดิฉัน/ผมขอเสนอทางเลือกที่เป็น **ระยะสั้นและยืดหยุ่นสูง** ค่ะ/ครับ เช่น แผนคุ้มครอง 1 ปี หรือแผนที่ **หยุดจ่ายได้** ในกรณีที่มีปัญหาการเงิน โดยที่ยังคงได้รับความคุ้มครองอยู่" },
+        { id: "P1Q24", part: 1, q: "คุณพูดมาก็ดี แต่ผม/ดิฉันไม่สนใจครับ/ค่ะ ขอโทษนะคะ/ครับ", a: "เข้าใจที่คุณลูกค้าแจ้งมาค่ะ/ครับ แต่ถ้าเป็นเรื่องของการ **ประหยัด** หรือ **ผลประโยชน์ที่มากกว่าเดิม** คุณลูกค้าคิดว่าน่าสนใจไหมคะ/ครับ โครงการนี้จะเข้ามา **อุดช่องว่าง** ที่คุณลูกค้าอาจจะยังมองไม่เห็นในแผนเดิมค่ะ/ครับ" },
+        { id: "P1Q25", part: 1, q: "ขอให้ข้อมูลสั้นๆ ว่า...ไม่สนใจค่ะ/ครับ", a: "เข้าใจค่ะ/ครับ ถ้าอย่างนั้น ขออนุญาตฝากข้อมูลสั้นๆ *ในฐานะผู้เชี่ยวชาญ* เพื่อให้คุณลูกค้ามั่นใจว่าได้ **ปฏิเสธในสิ่งที่ทราบดีแล้ว** นะคะ/ครับ แผนนี้เป็น [ระบุประเภทประกัน] ที่ [ระบุจุดเด่น 1 อย่าง] ค่ะ/ครับ" },
+        { id: "P1Q26", part: 1, q: "ไม่ซื้อค่ะ/ครับ", a: "เข้าใจค่ะ/ครับ ดิฉัน/ผมไม่ได้โทรมาเพื่อให้คุณลูกค้า **ซื้อ** ทันทีค่ะ/ครับ แต่โทรมาเพื่อให้คุณลูกค้า **รับทราบทางเลือกที่ดีที่สุด** ในตลาดตอนนี้เท่านั้น ขออนุญาตให้ข้อมูล 30 วินาทีนะคะ/ครับ" },
+        { id: "P1Q27", part: 1, q: "มีประกันชีวิต/สุขภาพ/ออมทรัพย์ ที่ทำไว้ล่วงหน้าเรียบร้อยแล้วครับ/ค่ะ", a: "เราทราบว่าคุณลูกค้ามีกรมธรรม์อยู่แล้ว แต่โครงการที่เรานำเสนอนี้เป็น **'กรมธรรม์ฉบับที่ 2'** ที่เน้นเรื่อง [ระบุ: เบี้ยถูกลง/วงเงินสูงขึ้น] **โดยเฉพาะ** ค่ะ/ครับ เพื่อให้คุณลูกค้า **ไม่ต้องปรับแผนเดิม** ที่มีอยู่เลย" },
+        { id: "P1Q28", part: 1, q: "ขอโทษนะคะ/ครับ โทรผิดเวลามากเลยค่ะ/ครับ", a: "ต้องขออภัยจริงๆ ค่ะ/ครับ ถ้าอย่างนั้น **เวลาที่เหมาะสมที่สุด** ที่คุณลูกค้าสะดวกให้ดิฉัน/ผมโทรมาให้ข้อมูล **ภายในวันนี้** คือช่วงไหนดีคะ/ครับ?" },
+        { id: "P1Q29", part: 1, q: "ไม่สนใจทำเรื่องประกันกับบริษัท...ครับ/ค่ะ", a: "เข้าใจค่ะ/ครับ ดิฉัน/ผมทราบดีว่าคุณลูกค้าอาจเคยมีประสบการณ์ที่ไม่ดีกับบริษัทอื่น แต่เราอยากให้คุณลูกค้า **พิจารณาจากตัวผลิตภัณฑ์** ที่มีความคุ้มค่ามากกว่าชื่อบริษัทค่ะ/ครับ แผนนี้เป็นแผนที่ **[ระบุจุดเด่น]** ซึ่ง *ไม่เกี่ยวข้องกับภาพลักษณ์ของบริษัทในอดีต* เลยค่ะ/ครับ" },
+        { id: "P1Q30", part: 1, q: "สวัสดีครับ/ค่ะ ไม่สนใจประกันค่ะ/ครับ ขอวางสายนะคะ/ครับ", a: "สวัสดีค่ะ/ครับ เข้าใจเลยค่ะ/ครับ ดิฉัน/ผมทราบดีว่าคุณลูกค้าเป็นคนมีวินัยในการจัดการเรื่องนี้แล้ว แต่ที่โทรมานี้ไม่ใช่ประกันชีวิตแบบทั่วไปค่ะ/ครับ แต่เป็น [ระบุชื่อโครงการ/สิทธิพิเศษ] ที่ทางบริษัทมอบให้ **เฉพาะ** ลูกค้าคนสำคัญ ขอเวลา 30 วินาทีนะคะ/ครับ" }
+    ],
+            // Part 2: การตอบคำถามไขข้อกังวลใจของลูกค้า (30 ข้อ)
+part2: [
+    { id: "P2Q1", part: 2, q: "ถ้ามีโรคประจำตัวหรือเคยป่วยมาก่อน ประกันจะ **ไม่คุ้มครอง** ใช่ไหม?", a: "นี่เป็นคำถามที่ดีมากครับ/ค่ะ! สำหรับโรคที่เป็นมาก่อน (Pre-existing Condition) เรามีหลักเกณฑ์การพิจารณาครับ/ค่ะ **โดยทั่วไป** เราจะดูว่าคุณลูกค้าเป็นมานานแค่ไหน หากเป็นโรคเล็กน้อยที่รักษาหายแล้ว อาจจะคุ้มครองได้ทันที แต่ถ้าเป็นเรื้อรัง อาจมีข้อยกเว้นบางโรคหรือไม่คุ้มครองในช่วงแรก **ดิฉัน/ผมขออนุญาตสอบถามประวัติสั้นๆ เพื่อให้คำตอบที่ชัดเจนที่สุดครับ/ค่ะ**" },
+    { id: "P2Q2", part: 2, q: "ถ้าต้องรักษาในโรงพยาบาลเอกชนชั้นนำ จะมีปัญหาเรื่อง **วงเงินไม่พอ** หรือไม่?", a: "หมดกังวลเรื่องนั้นได้เลยครับ/ค่ะ แผนที่เรานำเสนอคือ [ระบุชื่อแผน] ซึ่งออกแบบมาให้มี **วงเงินต่อครั้ง** ที่สูงมาก ครอบคลุมค่าใช้จ่ายส่วนใหญ่ของโรงพยาบาลชั้นนำได้สบาย ๆ และยังมีการ **อัปเกรดความคุ้มครอง** ให้สอดคล้องกับค่ารักษาพยาบาลที่เพิ่มขึ้นในอนาคตด้วยครับ/ค่ะ" },
+    { id: "P2Q3", part: 2, q: "ขั้นตอนการเคลมยุ่งยากไหม? ต้อง **สำรองจ่าย** ก่อนหรือเปล่า?", a: "ขั้นตอนง่ายมากครับ/ค่ะ **เรามีระบบ Fax Claim/Direct Billing** เพียงแค่คุณลูกค้าแสดงบัตรประกันที่โรงพยาบาลในเครือข่าย ก็ไม่ต้องสำรองจ่ายเงินส่วนใหญ่เลยครับ/ค่ะ ยกเว้นกรณีที่เกินวงเงินของแผนเท่านั้น ส่วนการเคลมที่ต้องสำรองจ่ายก็ทำได้ผ่านแอปพลิเคชันอย่างรวดเร็วครับ/ค่ะ" },
+    { id: "P2Q4", part: 2, q: "กรณีฉุกเฉินหรืออุบัติเหตุ สามารถใช้ประกันเข้า **โรงพยาบาลไหนก็ได้** ทั่วประเทศจริงไหม?", a: "จริงครับ/ค่ะ สำหรับกรณี **ฉุกเฉิน** หรือ **อุบัติเหตุ** คุณลูกค้าสามารถเข้ารับการรักษาในโรงพยาบาลที่ใกล้ที่สุดได้เลยครับ/ค่ะ ไม่ว่าจะเป็นโรงพยาบาลในเครือข่ายหรือไม่ก็ตาม โดยบริษัทจะพิจารณาการเคลมตามความจำเป็นทางการแพทย์ครับ/ค่ะ" },
+    { id: "P2Q5", part: 2, q: "ถ้าหมอสั่งตรวจเพิ่มเติม เช่น MRI, CT Scan ประกันจะ **จ่ายค่าเครื่องมือพิเศษ** เหล่านี้ให้ไหม?", a: "แผนสุขภาพของเราเน้นการรักษาที่ทันสมัยครับ/ค่ะ **ค่าใช้จ่ายในการตรวจวินิจฉัยพิเศษ** เช่น MRI, CT Scan, PET Scan จะถูกครอบคลุมภายใต้วงเงินค่ารักษาพยาบาลผู้ป่วยใน (IPD) ตามความจำเป็นทางการแพทย์ที่แพทย์สั่งเลยครับ/ค่ะ" },
+    { id: "P2Q6", part: 2, q: "ประกันจะครอบคลุม **ค่ารักษาพยาบาลทางเลือก** (เช่น ฝังเข็ม กายภาพบำบัด) หรือไม่?", a: "โดยปกติแล้ว **การรักษาทางเลือกจะไม่ถูกรวมอยู่ในการคุ้มครองหลัก** ครับ/ค่ะ แต่ถ้าเป็น **กายภาพบำบัด** ที่แพทย์สั่งหลังการบาดเจ็บหรือผ่าตัด และอยู่ในช่วงเวลาที่กำหนด ก็จะอยู่ในความคุ้มครองครับ/ค่ะ หากต้องการความคุ้มครองทางเลือกเพิ่มเติม เรามีสัญญาเพิ่มเติมให้เลือกซื้อได้ครับ/ค่ะ" },
+    { id: "P2Q7", part: 2, q: "ถ้าต้องผ่าตัด **โรคที่เป็นมาก่อน** การทำประกัน (Pre-existing Condition) จะเคลมได้ไหม?", a: "หากโรคที่เป็นมาก่อน **ถูกระบุเป็นข้อยกเว้นไว้ในกรมธรรม์** ตั้งแต่แรก จะไม่สามารถเคลมได้ครับ/ค่ะ แต่ถ้าโรคดังกล่าว **ได้รับการอนุมัติให้คุ้มครอง** ตั้งแต่ทำสัญญา หรือไม่ได้ระบุเป็นข้อยกเว้นและพ้นช่วงระยะเวลารอคอยไปแล้ว ก็สามารถเคลมได้ตามเงื่อนไขครับ/ค่ะ" },
+    { id: "P2Q8", part: 2, q: "มี **จำนวนวันพักรักษาตัวสูงสุด** ที่จำกัดการเคลมต่อปีหรือไม่?", a: "ความคุ้มครองของเราเน้นที่ **วงเงินรวมต่อปี** ครับ/ค่ะ ไม่ได้จำกัดจำนวนวันพักรักษาตัวเหมือนแผนสมัยก่อน ซึ่งหมายความว่าคุณลูกค้าสามารถเข้าพักได้ตามความจำเป็นทางการแพทย์จนกว่าวงเงินต่อปีจะเต็มครับ/ค่ะ" },
+    { id: "P2Q9", part: 2, q: "ถ้าบริษัทประกันปฏิเสธการเคลม ฉันสามารถ **อุทธรณ์** หรือเรียกร้องได้อย่างไร?", a: "บริษัทเรามีขั้นตอนการอุทธรณ์ที่ชัดเจนและยุติธรรมครับ/ค่ะ คุณลูกค้าสามารถ **ยื่นเอกสารทางการแพทย์เพิ่มเติม** เพื่อให้ทีมแพทย์ผู้เชี่ยวชาญของเราพิจารณาอีกครั้ง หรือสามารถร้องเรียนผ่านหน่วยงานกำกับดูแล เช่น คปภ. ได้เลยครับ/ค่ะ" },
+    { id: "P2Q10", part: 2, q: "ถ้าฉันไปรักษาที่ต่างประเทศ ประกันสุขภาพนี้ **ยังให้ความคุ้มครอง** อยู่หรือไม่?", a: "แผนสุขภาพ [ระบุชื่อแผน] นี้มี **ความคุ้มครองทั่วโลก** ครับ/ค่ะ (หากเป็นแผน Global) หรือหากเป็นแผนในประเทศ จะครอบคลุมในกรณีฉุกเฉินที่เกิดขึ้นระหว่างการเดินทางในต่างประเทศครับ/ค่ะ แต่มีวงเงินและเงื่อนไขที่แตกต่างกัน **ขออนุญาตยืนยันขอบเขตของแผนนี้อีกครั้งครับ/ค่ะ**" },
+    { id: "P2Q11", part: 2, q: "เบี้ยประกันจะ **เพิ่มขึ้นเยอะมาก** เมื่ออายุมากขึ้นใช่ไหม?", a: "เบี้ยประกันสุขภาพจะเพิ่มขึ้นตามอายุเป็นปกติครับ/ค่ะ เนื่องจากความเสี่ยงสุขภาพที่สูงขึ้น **แต่เรามีการจัดการความเสี่ยงที่ดี** ทำให้เบี้ยปรับขึ้นอย่างมีเหตุผลและไม่ก้าวกระโดดจนเกินไป นอกจากนี้ยังสามารถเลือกแผนที่มี **เบี้ยคงที่ยาวนาน** ได้ด้วยครับ/ค่ะ" },
+    { id: "P2Q12", part: 2, q: "ปีหน้าบริษัทจะ **ปรับเบี้ยขึ้น** โดยไม่มีการแจ้งล่วงหน้าได้ไหม?", a: "บริษัทไม่สามารถปรับเบี้ยขึ้นโดยพลการได้ครับ/ค่ะ การปรับเบี้ยเป็นไปตาม **หลักเกณฑ์ที่ คปภ. กำหนด** และเป็นไปตามสถิติความเสี่ยงของกลุ่มลูกค้าทั้งหมด ไม่ใช่แค่รายบุคคลครับ/ค่ะ หากมีการปรับขึ้น จะมีการแจ้งล่วงหน้าตามกฎหมายครับ/ค่ะ" },
+    { id: "P2Q13", part: 2, q: "ฉันสามารถ **ปรับลดความคุ้มครอง** ลงได้หรือไม่ หากงบประมาณมีปัญหา?", a: "สามารถทำได้ครับ/ค่ะ หากคุณลูกค้าประสบปัญหาด้านงบประมาณ เราสามารถช่วย **ลดระดับแผน** หรือ **เพิ่มความรับผิดชอบส่วนแรก (Deductible)** เพื่อให้เบี้ยถูกลงได้ครับ/ค่ะ บริษัทมีความยืดหยุ่นเพื่อให้คุณลูกค้ายังคงมีความคุ้มครองไว้ครับ/ค่ะ" },
+    { id: "P2Q14", part: 2, q: "มี **ค่าใช้จ่ายอื่น ๆ แฝง** นอกเหนือจากเบี้ยประกันที่จ่ายรายเดือน/รายปีไหม?", a: "ไม่มีครับ/ค่ะ คุณลูกค้าจะจ่ายเพียงแค่ **เบี้ยประกัน** ตามที่ระบุในตารางเท่านั้นครับ/ค่ะ **ยกเว้น** กรณีที่ต้องสำรองจ่ายเมื่อเกินวงเงิน หรือมีค่าใช้จ่ายส่วนที่ไม่ได้อยู่ในความคุ้มครองของแผนครับ/ค่ะ" },
+    { id: "P2Q15", part: 2, q: "ถ้าฉันไม่เคยเคลมเลย จะมี **ส่วนลด** หรือได้เงินคืนบ้างไหม?", a: "แม้ว่าประกันสุขภาพหลักจะไม่ใช่การออมทรัพย์ แต่เรามีโครงการพิเศษ เช่น **ส่วนลดเบี้ยประกันปีถัดไป** (No-Claim Bonus) หรือแผนสุขภาพควบการลงทุน (Unit Linked) ที่มีโอกาสได้รับผลตอบแทนหากไม่เคลมครับ/ค่ะ" },
+    { id: "P2Q16", part: 2, q: "สัญญาเป็นแบบ **ต่ออายุรายปี** ใช่ไหม? แล้วถ้าไม่ต่ออายุจะเกิดอะไรขึ้น?", a: "ใช่ครับ/ค่ะ สุขภาพเป็นแบบต่ออายุรายปี **ถ้าคุณลูกค้าไม่ต่ออายุ** กรมธรรมณ์ก็จะสิ้นสุดความคุ้มครองทันที และถ้าอยากทำใหม่ในภายหลัง อาจต้องแถลงสุขภาพใหม่ ซึ่งอาจมีปัญหาหากสุขภาพเปลี่ยนไปครับ/ค่ะ **จึงแนะนำให้คงความคุ้มครองไว้ครับ/ค่ะ**" },
+    { id: "P2Q17", part: 2, q: "มีระยะเวลา **รอคอย (Waiting Period)** สำหรับโรคอะไรบ้าง? และนานแค่ไหน?", a: "มีครับ/ค่ะ โดยหลักจะมีระยะรอคอย 30 วันสำหรับโรคทั่วไป และ 120 วันสำหรับโรคร้ายแรงบางชนิดตามที่ระบุในสัญญา **เพื่อให้คุณลูกค้าได้ประโยชน์สูงสุด เราควรเริ่มต้นความคุ้มครองให้เร็วที่สุดครับ/ค่ะ**" },
+    { id: "P2Q18", part: 2, q: "บริษัทจะ **ยกเลิก** กรมธรรม์ของฉันได้ไหม ถ้าฉันเคลมบ่อยเกินไป?", a: "ตามกฎหมาย บริษัท **ไม่สามารถยกเลิก** กรมธรรมณ์สุขภาพได้หากคุณลูกค้ามีการเคลมบ่อยครับ/ค่ะ ตราบใดที่คุณลูกค้าชำระเบี้ยตามกำหนดและไม่ได้มีการแถลงสุขภาพเป็นเท็จตั้งแต่แรก **คุณลูกค้ามั่นใจได้ว่าความคุ้มครองจะอยู่กับคุณลูกค้าครับ/ค่ะ**" },
+    { id: "P2Q19", part: 2, q: "ความคุ้มครองสุขภาพนี้ **คุ้มครองไปถึงอายุเท่าไหร่** หรือตลอดชีวิตหรือไม่?", a: "แผนนี้ให้ความคุ้มครองยาวนานถึง **อายุ [ระบุอายุสูงสุดของแผน เช่น 80 ปี หรือ ตลอดชีวิต 99 ปี]** ครับ/ค่ะ ซึ่งถือเป็นการวางแผนสุขภาพในระยะยาวที่มั่นคงมากครับ/ค่ะ" },
+    { id: "P2Q20", part: 2, q: "**ความเสี่ยง** ที่สำคัญที่สุดที่ไม่ได้อยู่ในความคุ้มครองคืออะไร?", a: "โดยทั่วไปคือ **ความเสี่ยงจากการฆ่าตัวตาย**, **การรักษาที่ไม่จำเป็นทางการแพทย์**, **การรักษาภาวะมีบุตรยาก**, และ **โรคที่เกิดจากการใช้ยาเสพติด** ครับ/ค่ะ แต่โดยรวมแล้วครอบคลุมโรคและอุบัติเหตุทั่วไปเกือบทั้งหมดครับ/ค่ะ" },
+    { id: "P2Q21", part: 2, q: "**ความมั่นคงทางการเงิน** ของบริษัทดีพอที่จะจ่ายค่ารักษาพยาบาลก้อนใหญ่ ๆ ได้จริงไหม?", a: "บริษัทของเรา [ระบุชื่อบริษัท] มี **อันดับความน่าเชื่อถือ [ระบุ A-Rating]** และมีอัตราส่วนเงินกองทุนที่สูงกว่าเกณฑ์ที่ คปภ. กำหนดมากครับ/ค่ะ **คุณลูกค้ามั่นใจได้ 100%** ว่าเรามีความพร้อมและศักยภาพในการจ่ายสินไหมทุกกรณีครับ/ค่ะ" },
+    { id: "P2Q22", part: 2, q: "**บริการให้คำปรึกษาทางการแพทย์** (Telemedicine) มีจริงและใช้งานได้ตลอด 24 ชั่วโมงไหม?", a: "มีจริงครับ/ค่ะ เรามี **บริการ Telemedicine 24 ชั่วโมง** ให้คำปรึกษาเบื้องต้นกับแพทย์ผู้เชี่ยวชาญ ซึ่งช่วยให้คุณลูกค้าตัดสินใจเข้ารับการรักษาได้อย่างรวดเร็วและถูกต้องโดยไม่ต้องออกจากบ้านเลยครับ/ค่ะ" },
+    { id: "P2Q23", part: 2, q: "ถ้าฉันเปลี่ยนเบอร์โทรศัพท์หรือที่อยู่ จะ **ติดต่อบริษัท** เพื่อแจ้งการเปลี่ยนแปลงได้อย่างไร?", a: "คุณลูกค้าสามารถแจ้งได้หลายช่องทางครับ/ค่ะ ทั้ง **ผ่านดิฉัน/ผมที่เป็นตัวแทน**, ผ่าน **ศูนย์บริการลูกค้า 24 ชั่วโมง**, หรือผ่าน **แอปพลิเคชัน/เว็บไซต์** ของบริษัทได้เลยครับ/ค่ะ สะดวกสบายและรวดเร็วครับ/ค่ะ" },
+    { id: "P2Q24", part: 2, q: "มี **แอปพลิเคชัน** หรือช่องทางออนไลน์ให้ตรวจสอบสถานะการเคลมและกรมธรรม์หรือไม่?", a: "มีครับ/ค่ะ บริษัทเรามี **แอปพลิเคชันมือถือ [ระบุชื่อ App]** ที่ทันสมัยมากครับ/ค่ะ คุณลูกค้าสามารถตรวจสอบรายละเอียดกรมธรรม์, สถานะการเคลม, และค้นหาโรงพยาบาลในเครือข่ายได้ตลอด 24 ชั่วโมงเลยครับ/ค่ะ" },
+    { id: "P2Q25", part: 2, q: "หากเกิดปัญหา ฉันสามารถ **พูดคุยกับพนักงานที่เป็นคนจริง ๆ** ได้ไหม ไม่ใช่ระบบอัตโนมัติ?", a: "แน่นอนครับ/ค่ะ! ถึงแม้เราจะมีระบบอัตโนมัติเพื่อความรวดเร็ว แต่เรามี **เจ้าหน้าที่บริการลูกค้า** ที่พร้อมให้บริการและตอบคำถามคุณลูกค้าได้ตลอด 24 ชั่วโมงครับ/ค่ะ เพียงแค่กด [ระบุเบอร์ต่อ/ทางเลือก] ก็ได้คุยกับคนจริง ๆ เลยครับ/ค่ะ" },
+    { id: "P2Q26", part: 2, q: "ประกันสุขภาพของบริษัทคุณ **ดีกว่าคู่แข่ง** ในตลาดอย่างไรบ้าง? (จุดเด่น 3 ข้อ)", a: "จุดเด่น 3 ข้อของเราคือ 1. **วงเงินที่สูงและยืดหยุ่น** (ปรับได้ตามค่าห้อง) 2. **ความรวดเร็วในการเคลม** (Fax Claim ภายใน 30 นาที) 3. **บริการเสริมพิเศษ** เช่น บริการรถพยาบาลฉุกเฉิน หรือ Telemedicine ครับ/ค่ะ" },
+    { id: "P2Q27", part: 2, q: "**รีวิวจากลูกค้าที่เคยเคลม** จริง ๆ เป็นอย่างไรบ้าง? มีปัญหาอะไรที่พบบ่อยไหม?", a: "ลูกค้าส่วนใหญ่พึงพอใจมากครับ/ค่ะ โดยเฉพาะเรื่อง **ความรวดเร็วในการเคลมแบบไม่ต้องสำรองจ่าย** ปัญหาที่พบบ่อยที่สุดคือการไม่เข้าใจเงื่อนไขของ **ข้อยกเว้นบางโรค** ซึ่งเป็นสิ่งที่ดิฉัน/ผมจะช่วยตรวจสอบและอธิบายให้คุณลูกค้าเข้าใจชัดเจนก่อนตัดสินใจครับ/ค่ะ" },
+    { id: "P2Q28", part: 2, q: "ถ้าฉันทำไปแล้วและ **เปลี่ยนใจ** ภายในกี่วันถึงจะได้รับเงินคืนเต็มจำนวน?", a: "คุณลูกค้ามีสิทธิ์ **ยกเลิกกรมธรรม์** ภายใน **15 วัน** นับจากวันที่ได้รับเล่มกรมธรรม์ (Free Look Period) และจะได้รับเบี้ยประกันคืนเต็มจำนวนครับ/ค่ะ" },
+    { id: "P2Q29", part: 2, q: "มี **ค่าธรรมเนียม** หรือ **ค่าใช้จ่ายในการยกเลิก** สัญญาหรือไม่?", a: "หากยกเลิกภายใน 15 วัน (Free Look Period) จะไม่มีค่าธรรมเนียมใด ๆ ครับ/ค่ะ หากยกเลิกหลังจากนั้น ค่าธรรมเนียมจะเป็นไปตามตารางมูลค่าเวนคืนกรมธรรม์ ซึ่งเป็นไปตามที่กฎหมายกำหนดครับ/ค่ะ" },
+    { id: "P2Q30", part: 2, q: "ฉันควร **เปรียบเทียบแผนนี้กับแผนอื่น ๆ** ของบริษัทคุณด้วยตัวเองก่อนไหม?", a: "แน่นอนครับ/ค่ะ การเปรียบเทียบเป็นสิ่งที่ดี แต่เพื่อประหยัดเวลา **ดิฉัน/ผมได้เลือกแผน [ระบุชื่อแผน] ที่เหมาะสมกับข้อมูลที่คุณลูกค้าแจ้งมาที่สุดแล้ว** แต่ถ้าคุณลูกค้ามีงบประมาณหรือความต้องการอื่น ๆ เพิ่มเติม ดิฉัน/ผมยินดีเปรียบเทียบแผนที่เหลือให้ดูได้ภายใน 5 นาทีครับ/ค่ะ" }
+],
+            // Part 3: การแก้ข้อโต้แย้งหรือการโน้มน้าวระหว่างปิดการขาย (30 ข้อ)
+part3: [
+    { id: "P3Q1", part: 3, q: "ขอคิดดูก่อนนะ เดี๋ยวถ้าสนใจจะโทรกลับไปเอง", a: "เข้าใจเลยครับ/ค่ะ การคิดทบทวนเป็นสิ่งที่ดี แต่การตัดสินใจวันนี้จะช่วย **ล็อกสิทธิ์ [ระบุ: เบี้ยราคาเดิม/ความคุ้มครองพิเศษ]** ให้คุณลูกค้าได้ทันทีครับ/ค่ะ ขออนุญาตสรุปข้อดีหลักๆ 3 ข้อสุดท้ายให้คุณลูกค้าทบทวนได้ง่ายขึ้นนะครับ/คะ?" },
+    { id: "P3Q2", part: 3, q: "ขอปรึกษาคนในครอบครัว/หัวหน้า/สามี/ภรรยาก่อน", a: "นั่นเป็นเรื่องสำคัญที่ควรทำครับ/ค่ะ เพื่อให้ปรึกษาได้อย่างมีประสิทธิภาพ ดิฉัน/ผมขอสรุป **จุดคุ้มครองหลัก 3 ประเด็น** ที่สำคัญที่สุดเพื่อที่คุณลูกค้าจะสามารถนำไปนำเสนอได้อย่างถูกต้องและครบถ้วนนะครับ/คะ" },
+    { id: "P3Q3", part: 3, q: "ตอนนี้ยังไม่พร้อมจ่าย (ขอเลื่อนไปจ่ายเดือนหน้า)", a: "ถ้าเช่นนั้น เรามีทางออกที่ยืดหยุ่นให้ครับ/ค่ะ คือการเลือก **ผ่อนชำระรายเดือน** ซึ่งเริ่มต้นเพียง [ระบุจำนวนเงินต่อวัน/เดือน] หรือให้ดิฉัน/ผม **จองสิทธิ์ให้วันนี้** และกำหนดวันชำระเงินที่สะดวกที่สุดภายใน 7 วันได้ไหมครับ/ค่ะ? (เพื่อล็อกสิทธิ์)" },
+    { id: "P3Q4", part: 3, q: "ขอให้ส่งเอกสารทั้งหมดมาทางอีเมลก่อน แล้วจะอ่านดู", a: "ดิฉัน/ผมยินดีส่งให้ทันทีครับ/ค่ะ แต่เอกสารมีรายละเอียดมาก การอธิบายสั้นๆ เพียง 5 นาที จะช่วยให้คุณลูกค้าทราบว่า **ส่วนไหนสำคัญที่สุดที่ควรอ่าน** ก่อนการตัดสินใจนะครับ/คะ" },
+    { id: "P3Q5", part: 3, q: "ขอเวลาเปรียบเทียบกับบริษัทอื่น ๆ ก่อน", a: "ถ้าเช่นนั้น ขออนุญาตช่วยคุณลูกค้าประหยัดเวลาครับ/ค่ะ แผนของเรามีจุดเด่นเรื่อง **[ระบุจุดเด่น เช่น วงเงินสูงสุด/เบี้ยคงที่]** ที่คู่แข่งส่วนใหญ่ไม่มี **มีอะไรที่บริษัทอื่นเสนอแล้วคุณลูกค้ายังไม่แน่ใจบ้างไหมครับ/คะ?**" },
+    { id: "P3Q6", part: 3, q: "พี่/หนูมีนัดหมายอื่นต่อ ต้องขอวางสายก่อนนะ", a: "เข้าใจครับ/ค่ะ ขอโทษที่รบกวนเวลา ดิฉัน/ผมขอใช้เวลา **15 วินาทีสุดท้าย** เพื่อยืนยันว่า **คุณลูกค้าได้สิทธิ์ [ระบุสิทธิ์]** นี้ก่อนที่จะพลาดไปนะครับ/คะ" },
+    { id: "P3Q7", part: 3, q: "เดี๋ยวฉันจะศึกษาข้อมูลบริษัทและผลิตภัณฑ์ของคุณจากอินเทอร์เน็ตก่อน", a: "เป็นความคิดที่ดีมากครับ/ค่ะ แต่ข้อมูลบนอินเทอร์เน็ตอาจจะเก่าหรือเป็นแผนอื่น **ดิฉัน/ผมมีข้อมูลแผนเฉพาะกิจวันนี้** ที่ยังไม่เผยแพร่ต่อสาธารณะ **คุณลูกค้ามั่นใจได้ว่าข้อมูลจากดิฉัน/ผมคือข้อมูลที่ถูกต้องที่สุดครับ/ค่ะ**" },
+    { id: "P3Q8", part: 3, q: "ฉันเป็นคนตัดสินใจช้า ขอเวลาทบทวนเรื่องนี้สัก 2-3 วัน", a: "เข้าใจครับ/ค่ะ แต่ 2-3 วันนี้อาจทำให้คุณลูกค้าต้อง **เริ่มต้นระยะรอคอย (Waiting Period) ช้าลง** ไปอีกนะครับ/คะ หากคุณลูกค้าตัดสินใจ **จองสิทธิ์วันนี้** ความคุ้มครองจะเริ่มนับเร็วขึ้นครับ/ค่ะ" },
+    { id: "P3Q9", part: 3, q: "ตอนนี้ฉันกำลังยุ่งอยู่กับโครงการอื่น/เรื่องส่วนตัวอื่น ๆ", a: "ขอแสดงความยินดีกับโครงการนั้นด้วยครับ/ค่ะ **ดิฉัน/ผมจะใช้เวลาแค่ 5 นาที** ในการบันทึกข้อมูลสำคัญเพื่อ **สำรองสิทธิ์** นี้ไว้ให้คุณลูกค้า โดยที่คุณลูกค้าสามารถกลับไปดำเนินการเรื่องสำคัญต่อได้เลยครับ/ค่ะ" },
+    { id: "P3Q10", part: 3, q: "ฉันจะบอกพี่/น้องชายที่เป็นตัวแทนประกันให้ทำเรื่องให้เอง", a: "ยินดีด้วยครับ/ค่ะที่คนในครอบครัวเป็นตัวแทน แต่แผนพิเศษนี้อาจมี **สิทธิประโยชน์และเบี้ยประกัน** ที่ **ต่างจากแผนปกติ** ที่ตัวแทนทั่วไปเสนอได้ครับ/ค่ะ ขออนุญาตให้ข้อมูลส่วนนี้ไปเปรียบเทียบกับน้องชายได้ไหมครับ/ค่ะ?" },
+    { id: "P3Q11", part: 3, q: "ราคาแพงไปหน่อยนะ มีแผนที่ถูกกว่านี้ไหม?", a: "หากราคาเป็นข้อกังวล ดิฉัน/ผมมีแผนที่สามารถ **ลดเบี้ยลงได้ [ระบุ %]** โดยการเพิ่ม **ความรับผิดชอบส่วนแรก (Deductible)** ครับ/ค่ะ ซึ่งจะทำให้คุณลูกค้ายังได้รับความคุ้มครองในกรณีเจ็บป่วยหนักอยู่ **แผนนี้จะช่วยคุณลูกค้าประหยัดได้มากครับ/ค่ะ**" },
+    { id: "P3Q12", part: 3, q: "ฉันไม่มีงบประมาณสำหรับสิ่งนี้ในตอนนี้", a: "แผนนี้ถูกออกแบบมาเพื่อ **ป้องกันไม่ให้คุณลูกค้าต้องใช้เงินก้อนใหญ่** ในอนาคตครับ/ค่ะ โดยเบี้ยประกันเพียง [ระบุจำนวนเงิน] ต่อเดือน ซึ่งถือเป็นการ **ลงทุนเพื่อปกป้องเงินเก็บ** ที่คุ้มค่าที่สุดครับ/ค่ะ" },
+    { id: "P3Q13", part: 3, q: "ฉันต้องใช้เงินส่วนนี้ไปกับอย่างอื่นที่สำคัญกว่า", a: "นั่นเป็นเรื่องจริงครับ/ค่ะ แต่จะมีอะไรสำคัญไปกว่า **ความมั่นคงทางสุขภาพ** และการป้องกันไม่ให้เงินเก็บทั้งหมดต้องหายไปกับค่ารักษาพยาบาลฉุกเฉินครับ/ค่ะ? **แผนนี้เป็นการจัดลำดับความสำคัญของความเสี่ยงครับ/ค่ะ**" },
+    { id: "P3Q14", part: 3, q: "ฉันไม่แน่ใจว่าจะสามารถจ่ายเบี้ยได้ตลอดรอดฝั่งไหม", a: "บริษัทเราเข้าใจถึงความไม่แน่นอนครับ/ค่ะ เรามีแผนที่อนุญาตให้คุณลูกค้า **หยุดพักชำระเบี้ย (Premium Holiday)** ได้ในกรณีฉุกเฉินทางการเงิน โดยยังคงรักษาสถานะความคุ้มครองไว้ได้ระยะหนึ่งครับ/ค่ะ" },
+    { id: "P3Q15", part: 3, q: "บริษัทอื่นเสนอความคุ้มครองใกล้เคียงกัน แต่เบี้ยถูกกว่า", a: "อาจเป็นจริงครับ/ค่ะ แต่รบกวนคุณลูกค้าตรวจสอบ **วงเงินสูงสุดต่อปี/ต่อครั้ง** และ **เครือข่ายโรงพยาบาล** รวมถึง **บริการเสริมพิเศษ** ที่เรามีให้ครับ/ค่ะ บ่อยครั้งที่เบี้ยถูกกว่าแลกมากับ **ข้อจำกัดที่มองไม่เห็น** ครับ/ค่ะ" },
+    { id: "P3Q16", part: 3, q: "ฉันไม่แน่ใจว่ามัน **คุ้มค่า** กับเงินที่จ่ายไปจริง ๆ ไหม", a: "ถ้าอย่างนั้น ขออนุญาตให้คุณลูกค้าลองจินตนาการถึง **มูลค่าความคุ้มครอง [ระบุวงเงินสูงสุด]** ที่คุณลูกค้าจะได้รับเทียบกับ **เบี้ย [ระบุจำนวนเงิน]** ต่อปี หากเกิดเจ็บป่วยหนักขึ้นมา นี่คือสิ่งที่เรียกว่าความคุ้มค่าสูงสุดครับ/ค่ะ" },
+    { id: "P3Q17", part: 3, q: "ฉันไม่มั่นใจใน **ความมั่นคง** ของบริษัทประกันของคุณ", a: "บริษัทเรา [ระบุชื่อบริษัท] ก่อตั้งมา [ระบุจำนวนปี] และมี **อัตราส่วนเงินกองทุนที่สูง** มากครับ/ค่ะ **เรามีอันดับความน่าเชื่อถือระดับสากล** ซึ่งยืนยันความมั่นคงของเราในการจ่ายสินไหมทดแทนได้ 100% ครับ/ค่ะ" },
+    { id: "P3Q18", part: 3, q: "ประสบการณ์จากคนรอบตัวบอกว่าประกันสุขภาพ **เคลมยาก**", a: "ดิฉัน/ผมเข้าใจความกังวลครับ/ค่ะ แต่ปัญหาส่วนใหญ่เกิดจาก **การไม่เข้าใจเงื่อนไขก่อนทำสัญญา** หรือ **การไม่แถลงสุขภาพที่เป็นจริง** ตั้งแต่แรกครับ/ค่ะ แผนของเรามี **ระบบเคลมแบบไม่ต้องสำรองจ่าย** ที่รวดเร็ว และผม/ดิฉันจะช่วยตรวจสอบเงื่อนไขทั้งหมดก่อนการสมัครครับ/ค่ะ" },
+    { id: "P3Q19", part: 3, q: "ฉันเคยมีประสบการณ์ที่ไม่ดีกับการซื้อประกันทางโทรศัพท์", a: "ดิฉัน/ผมขออภัยแทนบริษัทอื่น ๆ ด้วยครับ/ค่ะ บริษัทเรามี **การบันทึกเสียงและขั้นตอนการตรวจสอบคุณภาพ** ที่เข้มงวดมากครับ/ค่ะ และมี **ระยะเวลา Free Look 15 วัน** ให้คุณลูกค้าทบทวนและยกเลิกได้เต็มจำนวนหากไม่พอใจครับ/ค่ะ" },
+    { id: "P3Q20", part: 3, q: "ถ้าฉันยังสุขภาพดีอยู่ ไม่จำเป็นต้องทำตอนนี้ก็ได้นี่?", a: "การทำประกันตอนที่ **สุขภาพดีที่สุด** คือช่วงเวลาที่ **ดีที่สุด** ครับ/ค่ะ เพราะคุณลูกค้าจะ **ได้รับการคุ้มครองครบถ้วน 100%** และ **เบี้ยถูกที่สุด** หากรอจนสุขภาพเปลี่ยนไป อาจทำให้ถูกปฏิเสธหรือถูกเพิ่มเบี้ยได้ครับ/ค่ะ" },
+    { id: "P3Q21", part: 3, q: "ฉันไม่อยากให้ **ข้อมูลส่วนตัว** และเลขบัญชีทางโทรศัพท์", a: "เราเข้าใจเรื่องความเป็นส่วนตัวครับ/ค่ะ ข้อมูลทั้งหมดถูกจัดการอย่างปลอดภัยภายใต้ **นโยบายความเป็นส่วนตัวและ พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล** ข้อมูลบัญชีใช้เพื่อ **หักเบี้ยประกันเท่านั้น** โดยไม่มีใครเข้าถึงข้อมูลอื่นได้ครับ/ค่ะ" },
+    { id: "P3Q22", part: 3, q: "ฉันไม่มี **บัตรเครดิต** หรือ **สมุดบัญชี** อยู่กับตัวตอนนี้", a: "ไม่เป็นไรครับ/ค่ะ ดิฉัน/ผมสามารถบันทึกข้อมูลเพื่อ **สำรองสิทธิ์** ไว้ก่อนได้ และคุณลูกค้าสามารถ **ส่งข้อมูลการชำระเงิน** มาให้ดิฉัน/ผมทางช่องทางที่ปลอดภัย ภายในวันนี้ได้ไหมครับ/ค่ะ? (เพื่อรักษาสิทธิ์)" },
+    { id: "P3Q23", part: 3, q: "ฉันไม่สะดวก **รับสายยืนยัน** จากฝ่ายตรวจสอบคุณภาพ", a: "สายยืนยันเป็นขั้นตอนสำคัญเพื่อ **ยืนยันว่าคุณลูกค้าเข้าใจและยินยอม** ทุกเงื่อนไขครับ/ค่ะ โดยใช้เวลาเพียง 3-5 นาทีเท่านั้น **ขออนุญาตโทรกลับไป [ระบุเวลาที่ลูกค้าสะดวกที่สุด เช่น หลังเลิกงาน]** เพื่อให้การสมัครสมบูรณ์นะครับ/คะ" },
+    { id: "P3Q24", part: 3, q: "เอกสารมันเยอะและซับซ้อนเกินไป ฉันขี้เกียจอ่าน", a: "ดิฉัน/ผมได้ **ทำเครื่องหมาย** ในส่วนที่สำคัญที่สุดสำหรับคุณลูกค้าไว้แล้วครับ/ค่ะ ส่วนรายละเอียดปลีกย่อยเป็นข้อกำหนดทางกฎหมาย **คุณลูกค้าเพียงแค่ทบทวนส่วนที่ดิฉัน/ผมเน้นย้ำ** ก็เพียงพอต่อการตัดสินใจแล้วครับ/ค่ะ" },
+    { id: "P3Q25", part: 3, q: "ฉันต้องการ **นัดพบตัวแทน** เพื่อเซ็นเอกสารจริง", a: "การนัดพบตัวแทนอาจทำให้ **ขั้นตอนล่าช้า** และ **สิทธิ์พิเศษนี้หมดลง** ได้ครับ/ค่ะ การทำรายการทางโทรศัพท์นี้ถูกต้องตามกฎหมายและ **รวดเร็วกว่า** เพื่อให้คุณลูกค้าได้รับความคุ้มครองทันทีครับ/ค่ะ" },
+    { id: "P3Q26", part: 3, q: "ฉันไม่ใช่ผู้มีอำนาจตัดสินใจเรื่องค่าใช้จ่ายขนาดนี้", a: "ถ้าเช่นนั้น ขออนุญาตติดต่อ **ผู้มีอำนาจตัดสินใจโดยตรง** ได้ไหมครับ/ค่ะ หรือดิฉัน/ผมสามารถส่ง **สรุปผลประโยชน์สั้น ๆ** ไปให้คุณลูกค้านำเสนอเพื่อขออนุมัติได้เลยครับ/ค่ะ" },
+    { id: "P3Q27", part: 3, q: "ฉันจะซื้อเมื่อพร้อมเท่านั้น **อย่าเร่ง**", a: "ดิฉัน/ผมไม่ได้เร่งคุณลูกค้าครับ/ค่ะ เพียงแต่ดิฉัน/ผมมีหน้าที่แจ้งว่า **โอกาสในการได้สิทธิ์เบี้ยนี้จะหมดลงใน [ระบุเวลา/วันนี้]** ครับ/ค่ะ การจองสิทธิ์ไว้ก่อนจะช่วยให้คุณลูกค้าซื้อเมื่อพร้อมในราคาที่ดีที่สุดครับ/ค่ะ" },
+    { id: "P3Q28", part: 3, q: "คุณพูดเร็วไป ฉันตามไม่ทัน (ข้ออ้างในการชะลอ)", a: "ขออภัยครับ/ค่ะ ดิฉัน/ผมจะพูดให้ช้าลงนะครับ/คะ **มีส่วนไหนที่คุณลูกค้าต้องการให้ทวน** หรือให้ **ดิฉัน/ผมเน้นย้ำเป็นพิเศษ** ไหมครับ/คะ? (เน้นย้ำประโยชน์หลักอีกครั้งอย่างช้าๆ)" },
+    { id: "P3Q29", part: 3, q: "แผนนี้มัน **ยุ่งยาก/ซับซ้อน** เกินความจำเป็นของฉัน", a: "ดิฉัน/ผมเข้าใจครับ/ค่ะ หากต้องการความง่ายกว่านี้ **เรามีแผนที่เรียบง่ายกว่า** ซึ่งเน้นเฉพาะ [ระบุจุดคุ้มครองสำคัญ] และ **เบี้ยเริ่มต้น [ระบุจำนวนเงิน]** โดยตัดฟีเจอร์ที่ไม่จำเป็นออกไปครับ/ค่ะ สนใจแผนนี้ไหมครับ/คะ?" },
+    { id: "P3Q30", part: 3, q: "ฉันไม่เชื่อในคำว่า **'สิทธิ์พิเศษมีจำนวนจำกัด'** ของคุณ", a: "เข้าใจครับ/ค่ะ คำว่า 'จำกัด' นี้หมายถึง **โควต้าเบี้ยพิเศษ** ที่บริษัทจัดสรรให้ลูกค้ากลุ่มนี้โดยเฉพาะ **ซึ่งหมดลงตามรอบทุก ๆ [ระบุช่วงเวลา เช่น สิ้นเดือน]** หากเกินช่วงนี้ คุณลูกค้าจะต้องทำในราคาปกติครับ/ค่ะ **การันตีด้วยการแจ้งเตือนจากระบบของเราครับ/ค่ะ**" }
+]
         };
-        
+
+
         // --- Global Variables ---
-        let audioBlobs = { part1: {}, part2: {}, part3: {} };
+        let audioBlobs = { part1: {}, part2: {}, part3: {} }; 
         let mediaRecorder;
         let audioChunks = [];
         let currentPart = 'part1'; 
         let shuffledQuestions = []; 
         let currentIndex = 0;
-        
+        let currentBlobUrl = null; // CRITICAL FIX: Global variable to manage the current playable Blob URL
+
         const inputUserName = document.getElementById('inputUserName');
         const mainAlert = document.getElementById('mainAlert');
         const recordingStatus = document.getElementById('recordingStatus');
@@ -466,15 +428,15 @@ async function submitResponse(currentUserId, recordedBlob) {
         const playbackAudio = document.getElementById('playbackAudio');
         const questionList = document.getElementById('questionList');
         const loadingOverlay = document.getElementById('loadingOverlay');
-        const submitBtn = document.getElementById('submitBtn');
+        const submitBtn = document.getElementById('submitBtn'); 
         const questionPrompt = document.getElementById('questionPrompt');
         const requiredAnswer = document.getElementById('requiredAnswer');
+        const sendQuestionBtn = document.getElementById('sendQuestionBtn'); 
 
 
         // --- Helper Functions ---
-        
-        function showAlert(message, type = 'info') {
-            mainAlert.textContent = message;
+        function showAlert(message, type = 'info') { 
+            mainAlert.innerHTML = message;
             mainAlert.className = `alert ${type}`;
             mainAlert.style.display = 'block';
             setTimeout(() => {
@@ -482,36 +444,93 @@ async function submitResponse(currentUserId, recordedBlob) {
             }, 5000);
         }
 
-        function generateFileName(questionId) {
-            const userName = inputUserName.value.trim().replace(/[^a-zA-Z0-9ก-ฮเ-์]/g, '_');
-            const timestamp = Date.now();
-            return `${userName}_${questionId}_${timestamp}.webm`;
-        }
-
-        function saveUserName() {
+        window.saveUserName = function() {
             localStorage.setItem('examUserName', inputUserName.value.trim());
             checkSubmitButtonStatus();
         }
-        
-        // --- Core Functions ---
 
-        /**
-         * @description สร้างและแสดงรายการคำถามทั้งหมดทางด้านซ้าย
-         */
+        // --- Supabase Core Functions (Logic Unchanged) ---
+        async function uploadAudioToSupabase(fileBlob, questionId, partKey, userName) { 
+            const partNum = partKey.replace('part', 'P');
+            const safeUserName = userName.replace(/[^a-zA-Z0-9ก-ฮเ-์]/g, '_');
+            const fileName = `${safeUserName}_${partNum}_${questionId}_${Date.now()}.webm`;
+            const filePath = `${partKey}/${questionId}/${fileName}`; 
+            const audioFile = new File([fileBlob], fileName, { type: fileBlob.type });
+
+            const { error } = await supabase.storage
+                .from('responses')
+                .upload(filePath, audioFile, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (error) {
+                throw new Error(`Upload failed for ${questionId}: ${error.message}`);
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('responses')
+                .getPublicUrl(filePath);
+
+            return publicUrl;
+        }
+
+        async function submitSingleResponse(blob, question, userName, partKey) { 
+            const publicUrl = await uploadAudioToSupabase(blob, question.id, partKey, userName);
+            const questionNumber = parseInt(question.id.replace(/[a-zA-Z]+/, ''));
+            if (isNaN(questionNumber)) {
+                throw new Error(`Invalid question ID format: ${question.id}`);
+            }
+
+            const responseToInsert = {
+                user_id: userName, 
+                exam_id: userName, 
+                part: partKey, 
+                question_number: questionNumber, 
+                audio_url: publicUrl, 
+                created_at: new Date().toISOString()
+            };
+            
+            const { error: insertError } = await supabase
+                .from('voice_answers')
+                .insert([responseToInsert]);
+
+            if (insertError) {
+                throw new Error(`Database submission failed: ${insertError.message}`);
+            }
+            
+            return questionNumber;
+        }
+
+
+        // --- UI and Navigation Functions ---
+                
         function renderQuestionList() {
             questionList.innerHTML = '';
             shuffledQuestions.forEach((q, index) => {
                 const item = document.createElement('div');
                 item.className = 'question-item';
                 item.id = `q-item-${index}`;
-                item.setAttribute('onclick', `displayQuestionFromList(${index})`);
+                item.setAttribute('onclick', `displayQuestionFromList(${index})`); 
                 
-                const isRecorded = audioBlobs[currentPart][q.id];
-                const statusIcon = isRecorded ? 
-                    '<span class="status-icon" style="color: green;">✓</span>' :
-                    '<span class="status-icon" style="color: red;">•</span>';
-                    
-                item.innerHTML = `ข้อที่ ${index + 1} ${statusIcon}`;
+                const status = audioBlobs[currentPart][q.id];
+                let statusIcon = '';
+                let color = 'red';
+
+                if (status) {
+                    if (status.submitted) {
+                        statusIcon = '✓';
+                        color = 'green';
+                    } else {
+                        statusIcon = '•';
+                        color = 'orange';
+                    }
+                } else {
+                    statusIcon = '•';
+                    color = 'red';
+                }
+
+                item.innerHTML = `ข้อที่ ${index + 1} <span class="status-icon" style="color: ${color};">${statusIcon}</span>`;
                 
                 if (index === currentIndex) {
                     item.classList.add('active');
@@ -519,100 +538,149 @@ async function submitResponse(currentUserId, recordedBlob) {
                 
                 questionList.appendChild(item);
             });
-            checkSubmitButtonStatus();
+            checkSubmitButtonStatus(); 
         }
 
-        /**
-         * @description แสดงคำถาม ณ ตำแหน่งที่กำหนด
-         * @param {number} index - ตำแหน่งคำถาม (0-based)
-         */
-        function displayQuestion(index) {
-            currentIndex = index;
-            const question = shuffledQuestions[index];
-
-            document.getElementById('currentQuestionTitle').textContent = `Part ${question.part}: คำถามข้อที่ ${index + 1}`;
+        function updateQuestionUI(question) {
+            document.getElementById('currentQuestionTitle').textContent = `Part ${question.part}: คำถามข้อที่ ${currentIndex + 1}`;
             
-            // 💡 แสดง Q (โจทย์)
             questionPrompt.textContent = question.q; 
-            
-            // 💡 แสดง A (สคริปต์คำตอบ)
             requiredAnswer.innerHTML = question.a;
             
-            // 💡 ซ่อนปุ่ม Next และ Previous (ใช้การคลิกที่รายการด้านซ้ายแทน)
-            document.getElementById('prevBtn').style.display = 'none';
-            document.getElementById('nextBtn').style.display = 'none';
+            const status = audioBlobs[currentPart][question.id];
             
-            // ตรวจสอบไฟล์เสียงที่บันทึกไว้
+            // 1. Clear previous source and hide player
+            playbackAudio.src = '';
             playbackAudio.style.display = 'none';
-            if (audioBlobs[currentPart][question.id]) {
-                const blob = audioBlobs[currentPart][question.id];
-                playbackAudio.src = URL.createObjectURL(blob);
+            sendQuestionBtn.style.display = 'none';
+            sendQuestionBtn.disabled = true;
+
+            if (status && status.blob) {
+                // 2. Set new source and force load for cross-platform stability
+                playbackAudio.src = currentBlobUrl; // ใช้ URL ที่ถูกสร้างและเก็บไว้
                 playbackAudio.style.display = 'block';
-                recordingStatus.textContent = 'สถานะ: บันทึกเสียงแล้ว (สามารถฟังหรือบันทึกใหม่ได้)';
+                playbackAudio.load(); // CRITICAL FIX: บังคับโหลดใหม่
+
+                if (status.submitted) {
+                    recordingStatus.textContent = 'สถานะ: ส่งข้อมูลสำเร็จแล้ว (สามารถฟังหรือบันทึกใหม่เพื่อส่งซ้ำได้)';
+                    sendQuestionBtn.textContent = 'บันทึกใหม่และส่งซ้ำ';
+                    sendQuestionBtn.style.display = 'block';
+                    sendQuestionBtn.disabled = false;
+                } else {
+                    recordingStatus.textContent = 'สถานะ: บันทึกสำเร็จแล้ว! กรุณาฟังและกด "ส่งคำตอบข้อนี้"';
+                    sendQuestionBtn.textContent = 'ส่งคำตอบข้อนี้ (บันทึกและส่ง)';
+                    sendQuestionBtn.style.display = 'block';
+                    sendQuestionBtn.disabled = false;
+                }
             } else {
-                playbackAudio.src = '';
+                // ยังไม่ได้บันทึก
                 recordingStatus.textContent = 'สถานะ: ยังไม่ได้เริ่มบันทึกเสียง';
             }
             
-            // อัพเดทสถานะปุ่ม
             startRecBtn.disabled = false;
             stopRecBtn.disabled = true;
             
-            // อัพเดทสถานะในรายการ
             renderQuestionList();
         }
+
+        function displayQuestion(index) {
+            currentIndex = index;
+            const question = shuffledQuestions[index];
+            
+            // 1. Revoke old Blob URL (Memory Management & Playback Reset)
+            if (currentBlobUrl) {
+                URL.revokeObjectURL(currentBlobUrl);
+                currentBlobUrl = null;
+            }
+
+            // 2. Check and Create new Blob URL for the target question
+            const status = audioBlobs[currentPart][question.id];
+            if (status && status.blob) {
+                currentBlobUrl = URL.createObjectURL(status.blob);
+            }
+
+            updateQuestionUI(question);
+        }
         
-        /**
-         * @description ฟังก์ชันที่ถูกเรียกเมื่อคลิกที่รายการคำถาม
-         * @param {number} index - ตำแหน่งคำถาม (0-based)
-         */
+        // Expose function for onclick attribute
         window.displayQuestionFromList = function(index) {
             if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                // ใช้วิธีแสดง modal แทน confirm()
                 if (!confirm('กรุณาหยุดบันทึกเสียงก่อนเปลี่ยนไปทำข้ออื่น')) {
                     return;
                 }
-                // ถ้าผู้ใช้กดยืนยันให้หยุดบันทึก
                 if (mediaRecorder.state === 'recording') {
-                     mediaRecorder.stop();
-                     mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                    mediaRecorder.stop(); 
                 }
             }
             displayQuestion(index);
         };
-        
-        /**
-         * @description โหลดชุดคำถามของ Part ที่เลือก และเริ่มที่คำถามแรก
-         * * 💡 การแก้ไขที่สำคัญ: ยกเลิกการสุ่ม และใช้คำถามทั้งหมดตามลำดับ 
-         */
+
         window.loadPart = function(partKey) {
             if (!inputUserName.value.trim()) {
                 showAlert('กรุณากรอกชื่อ-นามสกุล/รหัสพนักงานก่อนเลือก Part', 'warning');
                 return;
             }
-            saveUserName();
+            window.saveUserName();
             
             currentPart = partKey;
-            currentIndex = 0;
             
             const allQuestions = questions[currentPart];
-            // 💡 ใช้คำถามทั้งหมดตามลำดับเดิม (ไม่มีการสุ่ม)
             shuffledQuestions = allQuestions; 
             
-            document.getElementById('examArea').style.display = 'flex';
+            document.getElementById('examArea').style.display = 'grid';
             
-            // อัพเดทปุ่ม Part
             document.querySelectorAll('.part-button').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btn${partKey.charAt(0).toUpperCase() + partKey.slice(1)}`).classList.add('active');
 
-            displayQuestion(currentIndex);
+            displayQuestion(0); 
         };
 
-        // --- Recording Functions ---
+        // --- Submission Control (Logic Unchanged) ---
+        window.handleSingleSubmission = async function() { 
+            const question = shuffledQuestions[currentIndex];
+            const questionId = question.id;
+            const userName = inputUserName.value.trim();
+            const status = audioBlobs[currentPart][questionId];
+            
+            if (!status || !status.blob) {
+                showAlert('ไม่พบไฟล์เสียงที่บันทึกไว้สำหรับข้อนี้ กรุณาบันทึกใหม่', 'warning');
+                return;
+            }
 
-        /**
-         * @description เริ่มบันทึกเสียง
-         */
+            const audioBlob = status.blob;
+
+            loadingOverlay.style.display = 'flex';
+            recordingStatus.textContent = 'สถานะ: กำลังอัปโหลดและส่งข้อมูล...';
+            sendQuestionBtn.disabled = true;
+
+            try {
+                const questionNum = await submitSingleResponse(audioBlob, question, userName, currentPart);
+                
+                loadingOverlay.style.display = 'none';
+                audioBlobs[currentPart][questionId].submitted = true; 
+
+                recordingStatus.textContent = 'สถานะ: ส่งข้อมูลสำเร็จแล้ว!';
+                showAlert(`ส่ง Part ${currentPart.replace('part', '')} ข้อที่ ${questionNum} สำเร็จแล้ว!`, 'success');
+
+            } catch (error) {
+                loadingOverlay.style.display = 'none';
+                console.error('Submission Error:', error);
+                
+                if (audioBlobs[currentPart][questionId]) {
+                    audioBlobs[currentPart][questionId].submitted = false; 
+                }
+
+                recordingStatus.textContent = 'สถานะ: เกิดข้อผิดพลาดในการส่งข้อมูล! กรุณากด "ส่งคำตอบข้อนี้" อีกครั้ง';
+                showAlert(`ส่งข้อมูลล้มเหลว: ${error.message}`, 'warning');
+
+            } finally {
+                updateQuestionUI(question);
+            }
+        };
+
+
+        // --- Recording Functions (FIXED: Start/Stop button logic) ---
+
         window.handleStartRecording = async function() {
             if (!inputUserName.value.trim()) {
                 showAlert('กรุณากรอกชื่อ-นามสกุล/รหัสพนักงานก่อนเริ่มบันทึก', 'warning');
@@ -620,8 +688,10 @@ async function submitResponse(currentUserId, recordedBlob) {
             }
 
             try {
-                // ต้องระบุ type เป็น audio/webm เนื่องจากเป็นรูปแบบที่ได้คุณภาพดีและมีโอกาสใช้งานได้บนเบราว์เซอร์ส่วนใหญ่
+                // Request access to microphone
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                // CRITICAL FIX: Initialize MediaRecorder
                 mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
                 audioChunks = [];
 
@@ -632,8 +702,9 @@ async function submitResponse(currentUserId, recordedBlob) {
                 mediaRecorder.onstart = () => {
                     recordingStatus.textContent = 'สถานะ: กำลังบันทึกเสียง...';
                     startRecBtn.disabled = true;
-                    stopRecBtn.disabled = false;
+                    stopRecBtn.disabled = false; // Enable Stop button
                     playbackAudio.style.display = 'none';
+                    sendQuestionBtn.style.display = 'none';
                     playbackAudio.src = '';
                 };
 
@@ -641,170 +712,102 @@ async function submitResponse(currentUserId, recordedBlob) {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                     audioChunks = [];
                     
-                    // บันทึก Blob เข้าใน Global Storage
-                    const questionId = shuffledQuestions[currentIndex].id;
-                    audioBlobs[currentPart][questionId] = audioBlob;
+                    const question = shuffledQuestions[currentIndex];
+                    const questionId = question.id;
                     
-                    // อัพเดท Playback
-                    playbackAudio.src = URL.createObjectURL(audioBlob);
-                    playbackAudio.style.display = 'block';
+                    if (currentBlobUrl) {
+                        URL.revokeObjectURL(currentBlobUrl);
+                    }
+                    currentBlobUrl = URL.createObjectURL(audioBlob); 
+
+                    audioBlobs[currentPart][questionId] = { 
+                        blob: audioBlob, 
+                        submitted: false 
+                    }; 
+
+                    // Ensure all tracks are stopped after recording
+                    stream.getTracks().forEach(track => track.stop());
                     
-                    recordingStatus.textContent = 'สถานะ: บันทึกเสียงแล้ว (สามารถฟังหรือบันทึกใหม่ได้)';
+                    updateQuestionUI(question); 
+                    showAlert('บันทึกเสียงสำเร็จแล้ว! กรุณาตรวจสอบแล้วกด "ส่งคำตอบข้อนี้"', 'info');
+                };
+
+                mediaRecorder.onerror = (event) => {
+                    console.error("MediaRecorder Error:", event.error);
+                    recordingStatus.textContent = 'สถานะ: บันทึกผิดพลาด! ' + event.error.name;
                     startRecBtn.disabled = false;
                     stopRecBtn.disabled = true;
-                    
-                    // อัพเดทรายการคำถามและสถานะปุ่มส่ง
-                    renderQuestionList(); 
+                    stream.getTracks().forEach(track => track.stop());
                 };
 
                 mediaRecorder.start();
 
             } catch (err) {
                 console.error('Recording failed:', err);
-                showAlert('ไม่สามารถเข้าถึงไมโครโฟนได้: ' + err.message, 'warning');
+                if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+                    showAlert('❌ ไม่ได้รับอนุญาตให้ใช้ไมโครโฟน! กรุณาตรวจสอบการตั้งค่าเบราว์เซอร์และ HTTPS', 'warning');
+                } else if (err.name === "NotFoundError") {
+                    showAlert('❌ ไม่พบอุปกรณ์ไมโครโฟนในเครื่องของคุณ!', 'warning');
+                } else {
+                    showAlert('❌ เกิดข้อผิดพลาดในการเข้าถึงไมโครโฟน: ' + err.message, 'warning');
+                }
+                startRecBtn.disabled = false;
+                stopRecBtn.disabled = true;
             }
         };
 
-        /**
-         * @description หยุดบันทึกเสียง
-         */
         window.handleStopRecording = function() {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
+                // Disable button immediately to prevent double click
+                stopRecBtn.disabled = true;
                 mediaRecorder.stop();
-                // ปิด Track ของ Stream เพื่อปล่อยไมโครโฟน
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
             }
         };
 
-        // --- Submission & Upload ---
+        // --- Submission & Upload (Final) (Logic Unchanged) ---
 
-        /**
-         * @description ตรวจสอบว่ามีไฟล์เสียงที่บันทึกแล้วหรือไม่ เพื่อเปิดใช้งานปุ่มส่ง
-         */
         function checkSubmitButtonStatus() {
-            // 💡 อนุญาตให้กดปุ่ม Submit ได้ ถ้ามีชื่อผู้ใช้ และมีเสียงบันทึกอย่างน้อย 1 ไฟล์ใน Part ปัจจุบัน
-            const hasUserName = inputUserName.value.trim() !== '';
-            const recordedCount = Object.keys(audioBlobs[currentPart]).length;
-            
-            submitBtn.disabled = !(hasUserName && recordedCount > 0);
+            const totalQuestions = shuffledQuestions.length;
+            const submittedCount = Object.values(audioBlobs[currentPart]).filter(s => s.submitted).length;
+
+            submitBtn.textContent = `ส่งงาน Part ${currentPart.replace('part', '')} (ส่งแล้ว ${submittedCount}/${totalQuestions} ข้อ)`;
+
+            if (submittedCount > 0) { 
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
         }
 
-        /**
-         * @description ฟังก์ชันจำลองการอัปโหลดไฟล์เสียงไปยังเซิร์ฟเวอร์
-         * @param {Object} blobs - Object ที่มี Question ID เป็น key และ Blob เป็น value
-         */
-        function uploadBlobs(blobs) {
-            return new Promise((resolve, reject) => {
-                loadingOverlay.style.display = 'flex';
-                
-                const totalFiles = Object.keys(blobs).length;
-                let uploadedCount = 0;
-                
-                if (totalFiles === 0) {
-                     loadingOverlay.style.display = 'none';
-                     resolve();
-                     return;
-                }
-
-                // จำลองการอัปโหลดไฟล์ทีละไฟล์
-                for (const questionId in blobs) {
-                    const blob = blobs[questionId];
-                    const fileName = generateFileName(questionId);
-                    
-                    // 💡 โค้ดจริง: ใช้ fetch หรือ axios ที่นี่ เพื่อส่งไฟล์ไปยัง API ปลายทาง
-                    /* const formData = new FormData();
-                    formData.append('audioFile', blob, fileName);
-                    formData.append('questionId', questionId);
-                    formData.append('userName', inputUserName.value.trim());
-
-                    fetch('YOUR_UPLOAD_API_ENDPOINT', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new new Error('Upload failed');
-                        return response.json();
-                    })
-                    .then(() => {
-                        uploadedCount++;
-                        if (uploadedCount === totalFiles) {
-                            resolve();
-                        }
-                    })
-                    .catch(error => {
-                        reject(error);
-                    });
-                    */
-                    
-                    // 💡 โค้ดจำลอง: หน่วงเวลา 0.5 วินาทีต่อไฟล์
-                    setTimeout(() => {
-                        console.log(`[Mock Upload] ไฟล์ ${fileName} อัปโหลดสำเร็จ`);
-                        uploadedCount++;
-                        if (uploadedCount === totalFiles) {
-                            resolve();
-                        }
-                    }, 500); 
-                }
-            })
-            .finally(() => {
-                loadingOverlay.style.display = 'none';
-            });
-        }
-
-        /**
-         * @description ส่งข้อมูลและไฟล์เสียงทั้งหมด
-         * * 💡 การแก้ไขที่สำคัญ: ลบการตรวจสอบว่าต้องทำครบทุกข้อออก
-         */
         window.submitExam = function() {
-            if (!inputUserName.value.trim()) {
-                showAlert('กรุณากรอกชื่อ-นามสกุล/รหัสพนักงานก่อนส่ง', 'warning');
-                return;
-            }
-            
-            const recordedCount = Object.keys(audioBlobs[currentPart]).length;
+            const totalQuestions = shuffledQuestions.length;
+            const submittedCount = Object.values(audioBlobs[currentPart]).filter(s => s.submitted).length;
 
-            if (recordedCount === 0) {
-                showAlert('กรุณาบันทึกเสียงอย่างน้อย 1 ข้อใน Part นี้ก่อนส่ง', 'warning');
-                return;
-            }
+            if (totalQuestions > 0 && submittedCount === totalQuestions) {
+                showAlert(`Part ${currentPart.replace('part', '')} ส่งข้อมูลครบถ้วน ${submittedCount}/${totalQuestions} ข้อแล้ว! คุณสามารถเลือก Part อื่นเพื่อทำแบบทดสอบต่อได้เลย`, 'success');
             
-            // 💡 ใช้วิธีแสดง modal แทน confirm()
-            if (!window.confirm(`คุณต้องการส่งคำตอบ Part ${currentPart.replace('part', '')} (บันทึกแล้ว ${recordedCount} ข้อ) ใช่หรือไม่?`)) {
-                return;
+                document.getElementById('examArea').style.display = 'none';
+                document.getElementById('currentQuestionTitle').textContent = 'ส่งงานสำเร็จ';
+                document.getElementById('questionPrompt').textContent = 'กรุณาเลือก Part อื่นเพื่อทำแบบทดสอบต่อ';
+                document.getElementById('requiredAnswer').textContent = '';
+                
+            } else if (submittedCount > 0) {
+                showAlert(`**คุณได้ส่งไปแล้ว ${submittedCount} ข้อ** แต่ยังมีคำตอบ ${totalQuestions - submittedCount} ข้อใน Part นี้ที่ยังไม่ได้ถูกส่ง กรุณาตรวจสอบและกด "ส่งคำตอบข้อนี้" ในแต่ละข้อให้ครบถ้วนก่อน`, 'warning');
+            } else {
+                showAlert(`ยังไม่มีการส่งไฟล์เสียงสำเร็จเลย กรุณาส่งอย่างน้อย 1 ข้อก่อน`, 'warning');
             }
-
-            uploadBlobs(audioBlobs[currentPart])
-                .then(() => {
-                    showAlert('ส่งคำตอบและไฟล์เสียงสำเร็จเรียบร้อยแล้ว!', 'success');
-                    // ล้างข้อมูล Part ที่ส่งแล้ว
-                    audioBlobs[currentPart] = {};
-                    renderQuestionList(); 
-                    submitBtn.disabled = true;
-                    
-                    // เปลี่ยนสถานะหน้าจอเป็นหน้าเลือก Part ใหม่
-                    document.getElementById('examArea').style.display = 'none';
-                    document.getElementById('currentQuestionTitle').textContent = 'ส่งงานสำเร็จ';
-                    document.getElementById('questionPrompt').textContent = 'กรุณาเลือก Part อื่นเพื่อทำแบบทดสอบต่อ';
-                    document.getElementById('requiredAnswer').textContent = '';
-                    
-                })
-                .catch(error => {
-                    console.error('Submission Error:', error);
-                    showAlert('เกิดข้อผิดพลาดในการส่งข้อมูล/ไฟล์เสียง', 'warning');
-                });
         };
-        
+
+
         // --- Initialization ---
-        
-        // โหลดชื่อผู้ใช้งานจาก Local Storage
+
         const storedUserName = localStorage.getItem('examUserName');
         if (storedUserName) {
             inputUserName.value = storedUserName;
         }
-        
-        // ตรวจสอบสถานะปุ่มส่งเมื่อโหลดหน้าเว็บ
+
         checkSubmitButtonStatus();
-        
+
     </script>
 
 </body>
