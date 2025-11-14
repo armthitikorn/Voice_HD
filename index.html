@@ -231,7 +231,6 @@
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 8px;
-            /* NEW: Ensure alert is visible initially if needed */
             display: none; 
             font-weight: 700;
         }
@@ -336,7 +335,7 @@
 
         // --- Supabase Imports & Config ---
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-        import { v4 as uuidv4 } from 'https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/esm-browser/index.js'; // Added UUID import
+        import { v4 as uuidv4 } from 'https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/esm-browser/index.js';
 
         const supabaseUrl = 'https://wzwyotzzxycqfwercakh.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6d3lvdHp6eHljcWZ3ZXJjYWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNTg3MTMsImV4cCI6MjA3MjYzNDcxM30.lgiAf9oBUqsaWGb3u_80wuoKAODQHE_lIBxpGumhrno';
@@ -429,7 +428,7 @@
                 { id: "P2Q15", part: 2, q: "ถ้าฉันไม่เคยเคลมเลย จะมี **ส่วนลด** หรือได้เงินคืนบ้างไหม?", a: "แม้ว่าประกันสุขภาพหลักจะไม่ใช่การออมทรัพย์ แต่เรามีโครงการพิเศษ เช่น **ส่วนลดเบี้ยประกันปีถัดไป** (No-Claim Bonus) หรือแผนสุขภาพควบการลงทุน (Unit Linked) ที่มีโอกาสได้รับผลตอบแทนหากไม่เคลมครับ/ค่ะ" },
                 { id: "P2Q16", part: 2, q: "สัญญาเป็นแบบ **ต่ออายุรายปี** ใช่ไหม? แล้วถ้าไม่ต่ออายุจะเกิดอะไรขึ้น?", a: "ใช่ครับ/ค่ะ สุขภาพเป็นแบบต่ออายุรายปี **ถ้าคุณลูกค้าไม่ต่ออายุ** กรมธรรมณ์ก็จะสิ้นสุดความคุ้มครองทันที และถ้าอยากทำใหม่ในภายหลัง อาจต้องแถลงสุขภาพใหม่ ซึ่งอาจมีปัญหาหากสุขภาพเปลี่ยนไปครับ/ค่ะ **จึงแนะนำให้คงความคุ้มครองไว้ครับ/ค่ะ**" },
                 { id: "P2Q17", part: 2, q: "มีระยะเวลา **รอคอย (Waiting Period)** สำหรับโรคอะไรบ้าง? และนานแค่ไหน?", a: "มีครับ/ค่ะ โดยหลักจะมีระยะรอคอย 30 วันสำหรับโรคทั่วไป และ 120 วันสำหรับโรคร้ายแรงบางชนิดตามที่ระบุในสัญญา **เพื่อให้คุณลูกค้าได้ประโยชน์สูงสุด เราควรเริ่มต้นความคุ้มครองให้เร็วที่สุดครับ/ค่ะ**" },
-                { id: "P2Q18", part: 2, q: "บริษัทจะ **ยกเลิก** กรมธรรม์ของฉันได้ไหม ถ้าฉันเคลมบ่อยเกินไป?", a: "ตามกฎหมาย บริษัท **ไม่สามารถยกเลิก** กรมธรรมณ์สุขภาพได้หากคุณลูกค้ามีการเคลมบ่อยครับ/ค่ะ ตราบใดที่คุณลูกค้าชำระเบี้ยตามกำหนดและไม่ได้มีการแถลงสุขภาพเป็นเท็จตั้งแต่แรก **คุณลูกค้ามั่นใจได้ว่าความคุ้มครองจะอยู่กับคุณลูกค้าครับ/ค่ะ**" },
+                { id: "P2Q18", part: 2, q: "บริษัทจะ **ยกเลิก** กรมธรรมณ์ของฉันได้ไหม ถ้าฉันเคลมบ่อยเกินไป?", a: "ตามกฎหมาย บริษัท **ไม่สามารถยกเลิก** กรมธรรมณ์สุขภาพได้หากคุณลูกค้ามีการเคลมบ่อยครับ/ค่ะ ตราบใดที่คุณลูกค้าชำระเบี้ยตามกำหนดและไม่ได้มีการแถลงสุขภาพเป็นเท็จตั้งแต่แรก **คุณลูกค้ามั่นใจได้ว่าความคุ้มครองจะอยู่กับคุณลูกค้าครับ/ค่ะ**" },
                 { id: "P2Q19", part: 2, q: "ความคุ้มครองสุขภาพนี้ **คุ้มครองไปถึงอายุเท่าไหร่** หรือตลอดชีวิตหรือไม่?", a: "แผนนี้ให้ความคุ้มครองยาวนานถึง **อายุ [ระบุอายุสูงสุดของแผน เช่น 80 ปี หรือ ตลอดชีวิต 99 ปี]** ครับ/ค่ะ ซึ่งถือเป็นการวางแผนสุขภาพในระยะยาวที่มั่นคงมากครับ/ค่ะ" },
                 { id: "P2Q20", part: 2, q: "**ความเสี่ยง** ที่สำคัญที่สุดที่ไม่ได้อยู่ในความคุ้มครองคืออะไร?", a: "โดยทั่วไปคือ **ความเสี่ยงจากการฆ่าตัวตาย**, **การรักษาที่ไม่จำเป็นทางการแพทย์**, **การรักษาภาวะมีบุตรยาก**, และ **โรคที่เกิดจากการใช้ยาเสพติด** ครับ/ค่ะ แต่โดยรวมแล้วครอบคลุมโรคและอุบัติเหตุทั่วไปเกือบทั้งหมดครับ/ค่ะ" },
                 { id: "P2Q21", part: 2, q: "**ความมั่นคงทางการเงิน** ของบริษัทดีพอที่จะจ่ายค่ารักษาพยาบาลก้อนใหญ่ ๆ ได้จริงไหม?", a: "บริษัทของเรา [ระบุชื่อบริษัท] มี **อันดับความน่าเชื่อถือ [ระบุ A-Rating]** และมีอัตราส่วนเงินกองทุนที่สูงกว่าเกณฑ์ที่ คปภ. กำหนดมากครับ/ค่ะ **คุณลูกค้ามั่นใจได้ 100%** ว่าเรามีความพร้อมและศักยภาพในการจ่ายสินไหมทุกกรณีครับ/ค่ะ" },
@@ -540,27 +539,30 @@
             });
         }
         
+        // ** FIX 400 ERROR: Omitted audio_url and created_at **
         async function logSessionStart(userName) {
             if (!supabase || !selectedTsrGroup) return false;
+
+            const dataToInsert = {
+                user_id: currentUserId,
+                exam_id: userName,
+                part: 'SETUP', // Use SETUP for session start
+                question_number: 0,
+                tsr_group_id: selectedTsrGroup.id,
+                tsr_group_name: selectedTsrGroup.name_th,
+            };
 
             try {
                 // Log session start into the voice_answers table
                 const { error: insertError } 
                     = await supabase
                     .from('voice_answers')
-                    .insert([{
-                        user_id: currentUserId,
-                        exam_id: userName,
-                        part: 'SETUP', // Use SETUP for session start
-                        question_number: 0,
-                        audio_url: 'SESSION_START_LOG',
-                        tsr_group_id: selectedTsrGroup.id,
-                        tsr_group_name: selectedTsrGroup.name_th,
-                        created_at: new Date().toISOString()
-                    }]);
+                    .insert([dataToInsert]);
 
                 if (insertError) {
-                    throw insertError;
+                    // Check if error is related to table not having all columns (e.g. missing audio_url non-nullable)
+                    console.error("Superbase Session Log Error:", insertError);
+                    throw new Error(insertError.message || "Database insert error occurred.");
                 }
                 return true;
 
@@ -603,15 +605,14 @@
             if (isNaN(questionNumber)) {
                 throw new Error(`Invalid question ID format: ${question.id}`);
             }
-
+            
+            // ** FIX: Omitted created_at **
             const responseToInsert = {
                 user_id: currentUserId, 
                 exam_id: userName, 
                 part: partKey, 
                 question_number: questionNumber, 
                 audio_url: publicUrl, 
-                created_at: new Date().toISOString(),
-                // NEW FIELDS (Requires the voice_answers table to have these columns)
                 tsr_group_id: selectedTsrGroup.id,
                 tsr_group_name: selectedTsrGroup.name_th
             };
@@ -754,7 +755,7 @@
 
             window.saveUserName(); 
             
-            // NEW: Log session start (Only logs once per session start if the table structure allows INSERT only)
+            // NEW: Log session start (Only logs once per session start)
             loadingOverlay.style.display = 'flex';
             showAlert('กำลังบันทึกข้อมูลการเริ่มต้นเซสชัน...', 'info');
 
@@ -763,7 +764,7 @@
             loadingOverlay.style.display = 'none';
             
             if (!logSuccess) {
-                showAlert('❌ พบข้อผิดพลาดในการบันทึกข้อมูลกลุ่มเข้าสู่ Superbase (โปรดตรวจสอบการตั้งค่าตาราง)! แต่สามารถดำเนินการฝึกซ้อมต่อได้', 'warning');
+                showAlert('❌ พบข้อผิดพลาดในการบันทึกข้อมูลกลุ่มเข้าสู่ Superbase! (โปรดตรวจสอบตาราง) แต่สามารถดำเนินการฝึกซ้อมต่อได้', 'warning');
             } else {
                 showAlert(`✅ บันทึกข้อมูลเริ่มต้นเซสชัน (กลุ่ม: ${selectedTsrGroup.name_th}) สำเร็จแล้ว!`, 'success');
             }
@@ -918,6 +919,12 @@
         // --- Submission & Upload (Final) ---
 
         function checkSubmitButtonStatus() {
+            // Check if questions are loaded before calculating
+            if (shuffledQuestions.length === 0) {
+                submitBtn.disabled = true;
+                return;
+            }
+
             const totalQuestions = shuffledQuestions.length;
             const submittedCount = Object.values(audioBlobs[currentPart]).filter(s => s.submitted).length;
 
@@ -959,7 +966,8 @@
                 inputUserName.value = storedUserName;
             }
             renderTsrGroupRadios();
-            checkSubmitButtonStatus();
+            // Initial check for a non-existent part, will be reset by loadPart
+            checkSubmitButtonStatus(); 
         });
         
 
